@@ -32,7 +32,7 @@
     "nightly": "pnpm turbo run nightly --include-dependencies --no-deps",
     "nightly:lld": "pnpm turbo run nightly --filter=ledger-live-desktop",
     "test": "pnpm turbo run test --concurrency=100%",
-    "run:cli": "./libs/ledger-live-common/cli/bin/index.js",
+    "run:cli": "node ./libs/ledger-live-common/cli/bin/index.js",
     "lint": "pnpm turbo run lint",
     "lint:fix": "pnpm turbo run lint:fix",
     "typecheck": "pnpm turbo run typecheck",
