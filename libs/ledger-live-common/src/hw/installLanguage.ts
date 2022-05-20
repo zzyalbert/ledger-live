@@ -10,7 +10,7 @@ import { getProviderId } from "../manager/provider";
 import network from "../network";
 import { LanguageInstallRefusedOnDevice } from "../errors";
 
-type InstallLanguageEvent =
+export type InstallLanguageEvent =
   | {
       type: "progress";
       progress: number;
