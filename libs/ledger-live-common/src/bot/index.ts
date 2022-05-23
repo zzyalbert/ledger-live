@@ -1,14 +1,11 @@
 /* eslint-disable no-console */
-import fs from "fs";
-import path from "path";
+
 import { BigNumber } from "bignumber.js";
 import groupBy from "lodash/groupBy";
 import { log } from "@ledgerhq/logs";
-import invariant from "invariant";
 import flatMap from "lodash/flatMap";
 import { getEnv } from "../env";
 import allSpecs from "../generated/specs";
-import { Account } from "../types";
 import type { MutationReport, SpecReport } from "./types";
 import { promiseAllBatched } from "../promise";
 import {
@@ -17,7 +14,7 @@ import {
   formatCurrencyUnit,
   getFiatCurrencyByTicker,
 } from "../currencies";
-import { isAccountEmpty, toAccountRaw } from "../account";
+import { isAccountEmpty } from "../account";
 import { runWithAppSpec } from "./engine";
 import { formatReportForConsole, formatError } from "./formatters";
 import {
@@ -27,31 +24,17 @@ import {
   inferTrackingPairForAccounts,
 } from "../countervalues/logic";
 import { getPortfolio } from "../portfolio";
+import { botReportFolder } from "./botReportFolder";
+
 type Arg = Partial<{
   currency: string;
   family: string;
   mutation: string;
 }>;
+
 const usd = getFiatCurrencyByTicker("USD");
 
-function makeAppJSON(accounts: Account[]) {
-  const jsondata = {
-    data: {
-      settings: {
-        hasCompletedOnboarding: true,
-      },
-      accounts: accounts.map((account) => ({
-        data: toAccountRaw(account),
-        version: 1,
-      })),
-    },
-  };
-  return JSON.stringify(jsondata);
-}
-
 export async function bot({ currency, family, mutation }: Arg = {}) {
-  const SEED = getEnv("SEED");
-  invariant(SEED, "SEED required");
   const specs: any[] = [];
   const specsLogs: string[][] = [];
   const maybeCurrency = currency
@@ -211,7 +194,8 @@ export async function bot({ currency, family, mutation }: Arg = {}) {
           (s.mutations && s.mutations.every((r) => !r.mutation)))
     )
     .map((s) => s.spec.name);
-  const { GITHUB_RUN_ID, GITHUB_WORKFLOW } = process.env;
+  const GITHUB_RUN_ID = getEnv("GITHUB_RUN_ID");
+  const GITHUB_WORKFLOW = getEnv("GITHUB_WORKFLOW");
 
   let body = "";
   let title = "";
@@ -409,35 +393,20 @@ export async function bot({ currency, family, mutation }: Arg = {}) {
   });
   body += "\n</details>\n\n";
 
-  const { BOT_REPORT_FOLDER } = process.env;
+  const BOT_REPORT_FOLDER = getEnv("BOT_REPORT_FOLDER");
 
   const slackCommentTemplate = `${String(
     GITHUB_WORKFLOW
   )}: ${title} (<{{url}}|details> – <${runURL}|logs>)\n${subtitle}${slackBody}`;
 
   if (BOT_REPORT_FOLDER) {
-    await Promise.all([
-      fs.promises.writeFile(
-        path.join(BOT_REPORT_FOLDER, "full-report.md"),
-        body,
-        "utf-8"
-      ),
-      fs.promises.writeFile(
-        path.join(BOT_REPORT_FOLDER, "slack-comment-template.md"),
-        slackCommentTemplate,
-        "utf-8"
-      ),
-      fs.promises.writeFile(
-        path.join(BOT_REPORT_FOLDER, "before-app.json"),
-        makeAppJSON(allAccountsBefore),
-        "utf-8"
-      ),
-      fs.promises.writeFile(
-        path.join(BOT_REPORT_FOLDER, "after-app.json"),
-        makeAppJSON(allAccountsAfter),
-        "utf-8"
-      ),
-    ]);
+    await botReportFolder({
+      BOT_REPORT_FOLDER,
+      body,
+      slackCommentTemplate,
+      allAccountsBefore,
+      allAccountsAfter,
+    });
   }
 
   if (botHaveFailed) {
@@ -453,5 +422,7 @@ export async function bot({ currency, family, mutation }: Arg = {}) {
     });
     // throw new Error(txt);
     console.error(txt);
+    return -1;
   }
+  return 1;
 }
