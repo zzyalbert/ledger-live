@@ -351,7 +351,8 @@ export const ScreenName = {
 
   // solana
   SolanaEditMemo: "SolanaEditMemo",
-
+  BuyDeviceScreen: "BuyDeviceScreen",
+  PostBuyDeviceScreen: "PostBuyDeviceScreen",
   DiscoverScreen: "DiscoverScreen",
   Learn: "Learn",
 };
