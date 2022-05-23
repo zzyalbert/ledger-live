@@ -1,26 +1,12 @@
-import { concat, of, EMPTY, interval, Observable, TimeoutError, throwError, ReplaySubject } from "rxjs";
-import {
-  scan,
-  debounce,
-  debounceTime,
-  catchError,
-  switchMap,
-  tap,
-  distinctUntilChanged,
-  timeout,
-  filter,
-} from "rxjs/operators";
-import { useEffect, useCallback, useState } from "react";
+import { of, interval, Observable, TimeoutError, ReplaySubject } from "rxjs";
+import { scan, debounce, debounceTime, switchMap, tap, distinctUntilChanged, timeout, filter } from "rxjs/operators";
+import { useEffect, useState } from "react";
 import { log } from "@ledgerhq/logs";
-import type { DeviceInfo } from "../../types/manager";
-import type { ListAppsResult } from "../../apps/types";
 import { useReplaySubject } from "../../observable";
-import manager from "../../manager";
-import type { ConnectManagerEvent, Input as ConnectManagerInput } from "../connectManager";
 import installLanguageExec, { InstallLanguageEvent } from "../installLanguage";
 import type { Action, Device } from "./types";
 import isEqual from "lodash/isEqual";
-import { ConnectManagerTimeout, LanguageInstallTimeout } from "../../errors";
+import { LanguageInstallTimeout } from "../../errors";
 import { currentMode } from "./app";
 import { DisconnectedDevice, DisconnectedDeviceDuringOperation } from "@ledgerhq/errors";
 import { getDeviceModel } from "@ledgerhq/devices";
@@ -64,6 +50,10 @@ const reducer = (_: State, e: Event): State => {
       };
     case "installationCompleted":
       return { step: "success" };
+    case "appDetected":
+      return { step: "preparing" };
+    case "unresponsiveDevice":
+      return { step: "error", error: new LanguageInstallTimeout() };
   }
 };
 
@@ -84,7 +74,7 @@ const implementations = {
         .pipe(
           debounceTime(1000),
           filter((device): device is Device => device !== undefined && device !== null),
-          switchMap((device) => installLanguage((device as Device).deviceId, language))
+          switchMap(({ deviceId }) => installLanguage({ deviceId, language }))
         )
         .subscribe(
           (event) => event,
@@ -123,7 +113,7 @@ const implementations = {
       let installSub;
       let loopT;
       let disconnectT;
-      let device = null; // used as internal state for polling
+      let device: Device | null = null; // used as internal state for polling
 
       let stopDevicePollingError: Error | null = null;
 
@@ -137,28 +127,10 @@ const implementations = {
 
         log("manager/polling", "polling loop");
         // maybe filter on device
-        installSub = installLanguage(pollingOnDevice.deviceId, language)
-          .pipe(
-            timeout(DEVICE_POLLING_TIMEOUT),
-            catchError((err) => {
-              if(pollingOnDevice && err instanceof TimeoutError) {
-                const productName = getDeviceModel(pollingOnDevice.modelId).productName;
-
-                if(err instanceof TimeoutError) {
-                  return of({
-                    type: "error",
-                    error: new LanguageInstallTimeout(undefined, {
-                      productName,
-                    }) as Error,
-                  });
-                }
-              }
-
-              return throwError(err);
-            })
-          )
+        installSub = installLanguage({ deviceId: pollingOnDevice.deviceId, language })
+          .pipe(timeout(DEVICE_POLLING_TIMEOUT))
           .subscribe({
-            next: (event) => {
+            next: (event: Event) => {
               if (initT && device) {
                 clearTimeout(initT);
                 initT = null;
@@ -203,10 +175,6 @@ const implementations = {
                 if (device !== pollingOnDevice) {
                   // ...but any time an event comes back, it means our device was responding and need to be set back on in polling context
                   device = pollingOnDevice;
-                  subscriber.next({
-                    type: "deviceChange",
-                    device,
-                  });
                 }
 
                 subscriber.next(event);
@@ -216,8 +184,21 @@ const implementations = {
               // start a new polling if available
               if (!stopDevicePollingError) loopT = setTimeout(loop, POLLING);
             },
-            error: (e) => {
-              subscriber.error(e);
+            error: (err) => {
+              if (pollingOnDevice && err instanceof TimeoutError) {
+                const productName = getDeviceModel(pollingOnDevice.modelId).productName;
+
+                if (err instanceof TimeoutError) {
+                  return of({
+                    type: "error",
+                    error: new LanguageInstallTimeout(undefined, {
+                      productName,
+                    }) as Error,
+                  });
+                }
+              }
+
+              subscriber.error(err);
             },
           });
       }
@@ -233,88 +214,51 @@ const implementations = {
       };
     }).pipe(distinctUntilChanged(isEqual)),
 };
+
 export const createAction = (installLanguage: typeof installLanguageExec): InstallLanguageAction => {
   const useHook = (device: Device | null | undefined, language: Language): State => {
     // repair modal will interrupt everything and be rendered instead of the background content
-    const [repairModalOpened, setRepairModalOpened] = useState<{
-      auto: boolean;
-    } | null>(null);
+
     const [state, setState] = useState(() => getInitialState());
     const [resetIndex, setResetIndex] = useState(0);
     const deviceSubject = useReplaySubject(device);
+
     useEffect(() => {
       const impl = implementations[currentMode]({
         deviceSubject,
         installLanguage,
         language,
       });
-      if (repairModalOpened) return;
       // TODO, continue here, implementations should probably map the events the reducer type of event
       // according to errors and stuff and device disconnected yatta yatta
 
       const sub = impl
         .pipe(
           // debounce a bit the connect/disconnect event that we don't need
-          tap((e: Event) => log("actions-manager-event", e.type, e)), // tap(e => console.log("connectManager event", e)),
+          tap((e: Event) => log("actions-install-language-event", e.type, e)), // tap(e => console.log("connectManager event", e)),
           // we gather all events with a reducer into the UI state
           scan(reducer, getInitialState()), // tap(s => console.log("connectManager state", s)),
           // we debounce the UI state to not blink on the UI
-          debounce((s: State) => {
-            if (s.allowManagerRequestedWording || s.allowManagerGranted) {
-              // no debounce for allow manager
-              return EMPTY;
-            }
-
-            // default debounce (to be tweak)
-            return interval(1500);
-          })
+          debounce(() => interval(1500))
         ) // the state simply goes into a React state
         .subscribe(setState);
       return () => {
         sub.unsubscribe();
       };
-    }, [deviceSubject, resetIndex, repairModalOpened, language]);
-    const { deviceInfo } = state;
-    useEffect(() => {
-      if (!deviceInfo) return;
-      // Preload latest firmware in parallel
-      manager.getLatestFirmwareForDevice(deviceInfo).catch((e: Error) => {
-        log("warn", e.message);
-      });
-    }, [deviceInfo]);
-    const onRepairModal = useCallback((open) => {
-      setRepairModalOpened(
-        open
-          ? {
-              auto: false,
-            }
-          : null
-      );
-    }, []);
-    const closeRepairModal = useCallback(() => {
-      setRepairModalOpened(null);
-    }, []);
-    const onRetry = useCallback(() => {
-      setResetIndex((currIndex) => currIndex + 1);
-      setState((s) => getInitialState(s.device));
-    }, []);
-    const onAutoRepair = useCallback(() => {
-      setRepairModalOpened({
-        auto: true,
-      });
-    }, []);
-    return {
-      ...state,
-      repairModalOpened,
-      onRetry,
-      onAutoRepair,
-      closeRepairModal,
-      onRepairModal,
-    };
+    }, [deviceSubject, resetIndex, language]);
+
+    // TODO: do we need a retry function??
+    // const onRetry = useCallback(() => {
+    //   setResetIndex((currIndex) => currIndex + 1);
+    //   setState((s) => getInitialState());
+    // }, []);
+    // onRetry
+
+    return state;
   };
 
   return {
     useHook,
-    mapResult,
+    mapResult: (_) => undefined,
   };
 };

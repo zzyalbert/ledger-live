@@ -1,6 +1,6 @@
-import { Observable, from } from "rxjs";
-import { mergeMap } from "rxjs/operators";
-import { TransportError } from "@ledgerhq/errors";
+import { Observable, from, of, throwError } from "rxjs";
+import { catchError, concatMap, delay, mergeMap } from "rxjs/operators";
+import { DeviceOnDashboardExpected, TransportError, TransportStatusError } from "@ledgerhq/errors";
 
 import ManagerAPI from "../api/Manager";
 import { withDevice } from "./deviceAccess";
@@ -9,8 +9,19 @@ import { Language, languageIds, LanguagePackage } from "../types/languages";
 import { getProviderId } from "../manager/provider";
 import network from "../network";
 import { LanguageInstallRefusedOnDevice } from "../errors";
+import { AppAndVersion } from "./connectApp";
+import appSupportsQuitApp from "../appSupportsQuitApp";
+import quitApp from "./quitApp";
+import getAppAndVersion from "./getAppAndVersion";
+import { isDashboardName } from "./isDashboardName";
 
 export type InstallLanguageEvent =
+  | {
+      type: "appDetected";
+    }
+  | {
+      type: "unresponsiveDevice";
+    }
   | {
       type: "progress";
       progress: number;
@@ -19,13 +30,43 @@ export type InstallLanguageEvent =
       type: "devicePermissionRequested";
     };
 
-export default function installLanguage(deviceId: string, language: Language): Observable<InstallLanguageEvent> {
+const attemptToQuitApp = (transport, appAndVersion?: AppAndVersion): Observable<InstallLanguageEvent> =>
+  appAndVersion && appSupportsQuitApp(appAndVersion)
+    ? from(quitApp(transport)).pipe(
+        concatMap(() =>
+          of(<InstallLanguageEvent>{
+            type: "unresponsiveDevice",
+          })
+        ),
+        catchError((e) => throwError(e))
+      )
+    : of({
+        type: "appDetected",
+      });
+
+export type InstallLanguageRequest = {
+  deviceId: string;
+  language: Language;
+};
+
+export default function installLanguage({
+  deviceId,
+  language,
+}: InstallLanguageRequest): Observable<InstallLanguageEvent> {
   const sub = withDevice(deviceId)(
     (transport) =>
       new Observable<InstallLanguageEvent>((subscriber) => {
-        from(getDeviceInfo(transport))
+        const timeoutSub = of<InstallLanguageEvent>({
+          type: "unresponsiveDevice",
+        })
+          .pipe(delay(1000))
+          .subscribe((e) => subscriber.next(e));
+
+        const sub = from(getDeviceInfo(transport))
           .pipe(
             mergeMap(async (deviceInfo) => {
+              timeoutSub.unsubscribe();
+
               const deviceVersion = await ManagerAPI.getDeviceVersion(deviceInfo.targetId, getProviderId(deviceInfo));
 
               const seFirmwareVersion = await ManagerAPI.getCurrentFirmware({
@@ -91,9 +132,35 @@ export default function installLanguage(deviceId: string, language: Language): O
               }
 
               subscriber.complete();
+            }),
+            catchError((e: Error) => {
+              if (
+                e instanceof DeviceOnDashboardExpected ||
+                (e &&
+                  e instanceof TransportStatusError &&
+                  // @ts-expect-error typescript not checking agains the instanceof
+                  [0x6e00, 0x6d00, 0x6e01, 0x6d01, 0x6d02].includes(e.statusCode))
+              ) {
+                return from(getAppAndVersion(transport)).pipe(
+                  concatMap((appAndVersion) => {
+                    return !isDashboardName(appAndVersion.name)
+                      ? attemptToQuitApp(transport, appAndVersion)
+                      : of({
+                          type: "appDetected",
+                        });
+                  })
+                );
+              }
+
+              return throwError(e);
             })
           )
           .subscribe();
+
+        return () => {
+          timeoutSub.unsubscribe();
+          sub.unsubscribe();
+        };
       })
   );
 
