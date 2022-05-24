@@ -18,6 +18,31 @@ const babelConfig = {
   plugins: babelPlugins,
 };
 
+const babelTsConfig = {
+  presets: [
+    "@babel/preset-typescript",
+    [
+      "@babel/preset-env",
+      {
+        targets: {
+          electron: "7.1.9",
+        },
+      },
+    ],
+    "@babel/preset-react",
+    "@babel/preset-flow",
+  ],
+  plugins: [
+    ...babelPlugins,
+    [
+      "babel-plugin-styled-components",
+      {
+        ssr: false,
+      },
+    ],
+  ],
+};
+
 module.exports = {
   stats: "errors-only",
   target: "electron-main",
@@ -44,6 +69,11 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(ts)x?$/,
+        loader: "babel-loader",
+        options: babelTsConfig,
+      },
+      {
         test: /\.js$/i,
         loader: "babel-loader",
         exclude: /node_modules/,
@@ -67,5 +97,12 @@ module.exports = {
     alias: {
       "~": path.resolve(__dirname, "src"),
     },
+    extensions: [
+      ".jsx",
+      ".js",
+      ".tsx",
+      ".ts",
+      "..."
+    ]
   },
 };

@@ -12,10 +12,13 @@
     "resolveJsonModule": true,
     "strict": true,
     "target": "esnext",
-    "baseUrl": ".",
     "skipLibCheck": true,
     "sourceMap": true,
-    "rootDir": "."
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    },
   },
   "include": ["tests"],
   "files": ["package.json", "release-notes.json"],
