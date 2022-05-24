@@ -28,6 +28,7 @@ export type InstallLanguageEvent =
     }
   | {
       type: "devicePermissionRequested";
+      wording: string; // TODO: <--- 
     };
 
 const attemptToQuitApp = (transport, appAndVersion?: AppAndVersion): Observable<InstallLanguageEvent> =>
@@ -53,6 +54,7 @@ export default function installLanguage({
   deviceId,
   language,
 }: InstallLanguageRequest): Observable<InstallLanguageEvent> {
+  debugger;
   const sub = withDevice(deviceId)(
     (transport) =>
       new Observable<InstallLanguageEvent>((subscriber) => {
@@ -111,6 +113,7 @@ export default function installLanguage({
                 if (apdus[i].startsWith("e030")) {
                   subscriber.next({
                     type: "devicePermissionRequested",
+                    wording: "Aceita ai na moralzinha", // TODO: <---
                   });
                 }
 

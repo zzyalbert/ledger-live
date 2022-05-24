@@ -1,5 +1,3 @@
-// @flow
-
 import React, { PureComponent } from "react";
 import { Trans } from "react-i18next";
 import type { ModalStatus } from "./types";
@@ -23,12 +21,12 @@ import { track } from "~/renderer/analytics/segment";
 type Props = {
   deviceInfo: DeviceInfo,
   device: Device,
-  setFirmwareUpdateOpened: boolean => void,
+  setFirmwareUpdateOpened: (updateOpened: boolean) => void,
   disableFirmwareUpdate?: boolean,
   installed?: InstalledItem[],
-  onReset: (string[]) => void,
-  firmware: ?FirmwareUpdateContext,
-  error: ?Error,
+  onReset: (apps: string[]) => void,
+  firmware: FirmwareUpdateContext | null,
+  error: Error | null,
   isIncomplete?: boolean,
   openFirmwareUpdate?: boolean,
 };
@@ -38,7 +36,7 @@ type State = {
   stepId: StepId,
 };
 
-const initialStepId = ({ deviceInfo, device }): StepId =>
+const initialStepId = ({ deviceInfo, device }: { deviceInfo: DeviceInfo, device: Device }): StepId =>
   deviceInfo.isOSU
     ? "updateMCU"
     : manager.firmwareUpdateNeedsLegacyBlueResetInstructions(deviceInfo, device.modelId)

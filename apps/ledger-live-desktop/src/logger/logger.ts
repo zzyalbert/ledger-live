@@ -1,4 +1,3 @@
-// @flow
 import winston from "winston";
 import Transport from "winston-transport";
 import anonymizer from "./anonymizer";
@@ -14,7 +13,7 @@ const pinfo = format(info => {
   return info;
 });
 
-const transports = [];
+const transports: Transport[] | Transport = [];
 
 const logger = winston.createLogger({
   level: "debug",
@@ -22,7 +21,7 @@ const logger = winston.createLogger({
   transports,
 });
 
-export const add = (transport: *) => {
+export const add = (transport: Transport) => {
   logger.add(transport);
 };
 
@@ -37,7 +36,7 @@ export function enableDebugLogger() {
     // On Browser we want to preserve direct usage of console with the "expandable" objects
     const SPLAT = Symbol.for("splat");
     class CustomConsole extends Transport {
-      log(info, callback) {
+      log(info: any, callback: () => void) {
         setImmediate(() => {
           this.emit("logged", info);
         });
@@ -120,8 +119,8 @@ function summarizeAccount({
   operations,
   pendingOperations,
   subAccounts,
-}: Object) {
-  const o: Object = {
+}: any) {
+  const o: any = {
     type,
     balance,
     id,
@@ -147,7 +146,7 @@ function summarizeAccount({
 }
 
 // minize objects that gets logged to keep the essential
-export const summarize = (obj: mixed, key?: string): mixed => {
+export const summarize = (obj: any, key?: string): unknown => {
   switch (typeof obj) {
     case "object": {
       if (!obj) return obj;
@@ -156,14 +155,13 @@ export const summarize = (obj: mixed, key?: string): mixed => {
       if (Array.isArray(obj)) {
         return obj.map(o => summarize(o));
       }
-      if (
-        obj.type === "Account" ||
+      if (obj.type === "Account" ||
         // AccountRaw
         ("seedIdentifier" in obj && "freshAddressPath" in obj && "operations" in obj)
       ) {
         return summarizeAccount(obj);
       }
-      const copy = {};
+      const copy: any = {};
       for (const k in obj) {
         copy[k] = summarize(obj[k], k);
       }
@@ -212,14 +210,14 @@ export default {
 
   // tracks Redux actions (NB not all actions are serializable)
 
-  onReduxAction: (action: Object) => {
+  onReduxAction: (action: any) => {
     if (logRedux) {
       logger.log("debug", `⚛️  ${action.type}`, { type: "action" });
     }
   },
 
   // tracks keyboard events
-  onTabKey: (activeElement: ?HTMLElement) => {
+  onTabKey: (activeElement?: HTMLElement) => {
     if (!activeElement) return;
     const { classList, tagName } = activeElement;
     const displayEl = `${tagName.toLowerCase()}${classList.length ? ` ${classList.item(0)}` : ""}`;
@@ -241,7 +239,7 @@ export default {
     }
   },
 
-  network: ({ method, url, data }: { method: string, url: string, data: * }) => {
+  network: ({ method, url, data }: { method: string, url: string, data: any }) => {
     const log = `➡📡  ${method} ${url}`;
     if (logNetwork) {
       logger.log("info", log, { type: "network", data });
@@ -335,7 +333,7 @@ export default {
     }
   },
 
-  analyticsTrack: (event: string, properties: ?Object) => {
+  analyticsTrack: (event: string, properties?: any) => {
     if (logAnalytics) {
       logger.log("info", `△ track ${event}`, { type: ANALYTICS_TYPE, data: properties });
     }
@@ -346,7 +344,7 @@ export default {
     });
   },
 
-  analyticsPage: (category: string, name: ?string, properties: ?Object) => {
+  analyticsPage: (category: string, name?: string, properties?: any) => {
     const message = name ? `${category} ${name}` : category;
     if (logAnalytics) {
       logger.log("info", `△ page ${message}`, { type: ANALYTICS_TYPE, data: properties });
@@ -366,24 +364,24 @@ export default {
 
   // General functions in case the hooks don't apply
 
-  debug: (...args: any) => {
-    logger.log("debug", ...args);
+  debug: (message: string, ...rest: any []) => {
+    logger.log("debug", message, ...rest);
   },
 
-  info: (...args: any) => {
-    logger.log("info", ...args);
+  info: (message: string, ...rest: any []) => {
+    logger.log("info", message, ...rest);
   },
 
-  log: (...args: any) => {
-    logger.log("info", ...args);
+  log: (message: string, ...rest: any[]) => {
+    logger.log("info", message, ...rest);
   },
 
-  warn: (...args: any) => {
-    logger.log("warn", ...args);
+  warn: (message: string, ...rest: any[]) => {
+    logger.log("warn", message, ...rest);
   },
 
-  error: (...args: any) => {
-    logger.log("error", ...args);
+  error: (message: string, ...rest: any[]) => {
+    logger.log("error", message, ...rest);
   },
 
   critical: (error: Error, context?: string) => {
@@ -403,7 +401,7 @@ export default {
 
   add,
 
-  onLog: (log: *) => {
+  onLog: (log: any) => {
     logger.log(log);
   },
 };

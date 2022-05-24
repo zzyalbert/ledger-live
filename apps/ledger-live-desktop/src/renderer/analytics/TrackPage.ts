@@ -1,14 +1,15 @@
-// @flow
-import { memo, useEffect } from "react";
+import React, { memo, useEffect } from "react";
 import { page } from "./segment";
 
-let source;
+let source: string | undefined | null;
 
 export const setTrackingSource = (s?: string) => {
   source = s;
 };
 
-function TrackPage({ category, name, ...properties }: { category: string, name?: string }) {
+type Props = { category: string; name: string | null; [key: string]: unknown };
+
+const TrackPage: React.FC<Props> = ({ category, name, ...properties }) => {
   useEffect(() => {
     page(category, name, { ...properties, ...(source ? { source } : {}) });
     // reset source param once it has been tracked to not repeat it from further unrelated navigation
@@ -17,6 +18,6 @@ function TrackPage({ category, name, ...properties }: { category: string, name?:
   }, []);
 
   return null;
-}
+};
 
-export default memo<{ category: string, name?: string }>(TrackPage);
+export default memo<Props>(TrackPage);

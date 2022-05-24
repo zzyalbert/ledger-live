@@ -1,11 +1,10 @@
-// @flow
 import { serializeError } from "@ledgerhq/errors";
-import { commandsById } from "./commands";
+import { commandsById, Commands } from "./commands";
 import logger from "../logger";
 
-const subscriptions = {};
+const subscriptions: any = {};
 
-export function executeCommand(command: *, send: *) {
+export function executeCommand(command: { requestId: any, data: any, id: keyof Commands}, send: any) {
   const { data, requestId, id } = command;
   const cmd = commandsById[id];
   if (!cmd) {
@@ -25,14 +24,14 @@ export function executeCommand(command: *, send: *) {
         logger.onCmd("cmd.COMPLETE", id, Date.now() - startTime);
         send({ type: "cmd.COMPLETE", requestId });
       },
-      error: error => {
+      error: (error: Error) => {
         logger.warn("Command error:", { error });
         delete subscriptions[requestId];
         logger.onCmd("cmd.ERROR", id, Date.now() - startTime, error);
         send({ type: "cmd.ERROR", requestId, data: serializeError(error) });
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.warn("Command impl error:", { error });
     delete subscriptions[requestId];
     logger.onCmd("cmd.ERROR", id, Date.now() - startTime, error);
