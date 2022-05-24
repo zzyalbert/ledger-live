@@ -18,10 +18,10 @@ rn-nodeify --hack
 
 # issue: https://github.com/WalletConnect/walletconnect-monorepo/issues/595
 # manually shim
-sed -i -- 's/require("crypto")/require("react-native-crypto")/g' node_modules/@walletconnect/randombytes/dist/cjs/node/index.js
+#sed -i -- 's/require("crypto")/require("react-native-crypto")/g' node_modules/@walletconnect/randombytes/dist/cjs/node/index.js
 
 ## hack to remove module not found
-sed -i -- "s/require('module').builtinModules,//g" node_modules/stack-utils/index.js
+#sed -i -- "s/require('module').builtinModules,//g" node_modules/stack-utils/index.js
 
 
 # Create the dev .env file with APP_NAME if it doesn't exist

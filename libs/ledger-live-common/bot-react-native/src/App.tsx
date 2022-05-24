@@ -57,7 +57,7 @@ const App = () => {
       {data === 0 ? (
         <Text>Bot is running. Check the main console.</Text>
       ) : (
-        <Text testID='done'>Bot has finished</Text>
+        <Text testID="done">Bot has finished</Text>
       )}
     </View>
   );

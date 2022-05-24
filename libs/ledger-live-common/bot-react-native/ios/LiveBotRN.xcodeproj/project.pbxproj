@@ -11,9 +11,11 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		1E7007B13274D545C58D971C /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68E3A34AF06D04E5DE00959A /* ExpoModulesProvider.swift */; };
 		6172F2D35A4C3AA820D92908 /* libPods-LiveBotRN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6423831EA8574132BED9D8CC /* libPods-LiveBotRN.a */; };
 		7EF68E3733C33B6898317E18 /* libPods-LiveBotRN-LiveBotRNTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ABFE59519B596E51CEFDCCC0 /* libPods-LiveBotRN-LiveBotRNTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8CBF9956307A3017C47A47FE /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E07665BCE57A806253DADF0 /* ExpoModulesProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,7 +39,9 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = LiveBotRN/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = LiveBotRN/main.m; sourceTree = "<group>"; };
 		1D0AE47A65C8663E3B452821 /* Pods-LiveBotRN-LiveBotRNTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LiveBotRN-LiveBotRNTests.release.xcconfig"; path = "Target Support Files/Pods-LiveBotRN-LiveBotRNTests/Pods-LiveBotRN-LiveBotRNTests.release.xcconfig"; sourceTree = "<group>"; };
+		2E07665BCE57A806253DADF0 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-LiveBotRN/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		6423831EA8574132BED9D8CC /* libPods-LiveBotRN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LiveBotRN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		68E3A34AF06D04E5DE00959A /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-LiveBotRN-LiveBotRNTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		6C97AB639B58BBB4B15BBE30 /* Pods-LiveBotRN-LiveBotRNTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LiveBotRN-LiveBotRNTests.debug.xcconfig"; path = "Target Support Files/Pods-LiveBotRN-LiveBotRNTests/Pods-LiveBotRN-LiveBotRNTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = LiveBotRN/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ABFE59519B596E51CEFDCCC0 /* libPods-LiveBotRN-LiveBotRNTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LiveBotRN-LiveBotRNTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,6 +126,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				E233CBF5F47BEE60B243DCF8 /* Pods */,
+				C15E2DEC1C83C52872129258 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -137,6 +142,23 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		9BB695526784899E92FAA9DB /* LiveBotRNTests */ = {
+			isa = PBXGroup;
+			children = (
+				68E3A34AF06D04E5DE00959A /* ExpoModulesProvider.swift */,
+			);
+			name = LiveBotRNTests;
+			sourceTree = "<group>";
+		};
+		C15E2DEC1C83C52872129258 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				FC69ECE965715E16A1AC2C95 /* LiveBotRN */,
+				9BB695526784899E92FAA9DB /* LiveBotRNTests */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
 		E233CBF5F47BEE60B243DCF8 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -146,6 +168,14 @@
 				1D0AE47A65C8663E3B452821 /* Pods-LiveBotRN-LiveBotRNTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		FC69ECE965715E16A1AC2C95 /* LiveBotRN */ = {
+			isa = PBXGroup;
+			children = (
+				2E07665BCE57A806253DADF0 /* ExpoModulesProvider.swift */,
+			);
+			name = LiveBotRN;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -403,6 +433,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				00E356F31AD99517003FC87E /* LiveBotRNTests.m in Sources */,
+				1E7007B13274D545C58D971C /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,6 +443,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				8CBF9956307A3017C47A47FE /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,7 +468,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = LiveBotRNTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -460,7 +492,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = LiveBotRNTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -576,7 +608,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -634,7 +666,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
