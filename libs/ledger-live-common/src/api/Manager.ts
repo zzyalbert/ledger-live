@@ -213,7 +213,7 @@ const getLanguagePackages = async (
     method: "POST",
     url: URL.format({
       // TODO use the production key 
-      pathname: `https://appstore-k8s.staging.aws.ledger.fr/api/language-packages`,
+      pathname: `https://appstore.api.aws.stg.ldg-tech.com//api/language-packages`,
       query: {
         livecommonversion,
       },

@@ -271,10 +271,11 @@ export const createAction = (
     arg0: InstallLanguageRequest
   ) => Observable<InstallLanguageEvent>
 ): InstallLanguageAction => {
+
   const installLanguage = (device, language: Language) =>
     {
       console.log("installLanguage", {device, language});
-      concat(
+      return concat(
       of({
         type: "deviceChange",
         device,

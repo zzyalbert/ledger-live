@@ -30,7 +30,7 @@ type LanguagePackage = {
   date_last_modified: string;
 };
 
-const baseURL = "https://appstore-k8s.staging.aws.ledger.fr";
+const baseURL = "https://appstore.api.aws.stg.ldg-tech.com/";
 
 // Move this to the errors file
 const UserRefusedLanguagePack = createCustomErrorClass("UserRefusedLanguagePack");

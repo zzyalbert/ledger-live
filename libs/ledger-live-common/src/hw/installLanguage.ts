@@ -1,4 +1,4 @@
-import { Observable, from, of, throwError } from "rxjs";
+import { Observable, from, of, throwError, EMPTY } from "rxjs";
 import { catchError, concatMap, delay, mergeMap } from "rxjs/operators";
 import { DeviceOnDashboardExpected, TransportError, TransportStatusError } from "@ledgerhq/errors";
 
@@ -17,33 +17,33 @@ import { isDashboardName } from "./isDashboardName";
 
 export type InstallLanguageEvent =
   | {
-      type: "appDetected";
-    }
+    type: "appDetected";
+  }
   | {
-      type: "unresponsiveDevice";
-    }
+    type: "unresponsiveDevice";
+  }
   | {
-      type: "progress";
-      progress: number;
-    }
+    type: "progress";
+    progress: number;
+  }
   | {
-      type: "devicePermissionRequested";
-      wording: string; // TODO: <--- 
-    };
+    type: "devicePermissionRequested";
+    wording: string; // TODO: <--- 
+  };
 
 const attemptToQuitApp = (transport, appAndVersion?: AppAndVersion): Observable<InstallLanguageEvent> =>
   appAndVersion && appSupportsQuitApp(appAndVersion)
     ? from(quitApp(transport)).pipe(
-        concatMap(() =>
-          of(<InstallLanguageEvent>{
-            type: "unresponsiveDevice",
-          })
-        ),
-        catchError((e) => throwError(e))
-      )
+      concatMap(() =>
+        of(<InstallLanguageEvent>{
+          type: "unresponsiveDevice",
+        })
+      ),
+      catchError((e) => throwError(e))
+    )
     : of({
-        type: "appDetected",
-      });
+      type: "appDetected",
+    });
 
 export type InstallLanguageRequest = {
   deviceId: string;
@@ -144,18 +144,24 @@ export default function installLanguage({
                   // @ts-expect-error typescript not checking agains the instanceof
                   [0x6e00, 0x6d00, 0x6e01, 0x6d01, 0x6d02].includes(e.statusCode))
               ) {
-                return from(getAppAndVersion(transport)).pipe(
+                let quitAppObservable = from(getAppAndVersion(transport)).pipe(
                   concatMap((appAndVersion) => {
                     return !isDashboardName(appAndVersion.name)
                       ? attemptToQuitApp(transport, appAndVersion)
-                      : of({
-                          type: "appDetected",
-                        });
+                      : of<InstallLanguageEvent>({
+                        type: "appDetected",
+                      });
                   })
                 );
+
+                quitAppObservable.subscribe(
+                  event => subscriber.next(event),
+                  error => subscriber.error(error)
+                )
               }
 
-              return throwError(e);
+              subscriber.error(e);
+              return EMPTY;
             })
           )
           .subscribe();
