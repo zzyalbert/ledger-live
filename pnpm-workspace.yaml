@@ -5,5 +5,5 @@ packages:
   - "libs/ui/packages/*"
   - "libs/ledger-live-common/cli"
   - "libs/ledger-live-common/tools"
-  - "libs/ledger-live-common/bot-react-native"
+  - "tests/bot-rn"
   - "tools/**"

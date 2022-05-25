@@ -2,6 +2,14 @@
 
 cd $(dirname $0)/..
 
+bundle install
+
+if [ "$(uname)" == "Darwin" ]; then
+  (
+    cd ios && bundle exec pod install --deployment --repo-update
+  )
+fi
+
 # ./scripts/sync-families-dispatch.sh
 
 # patch --forward -i scripts/RCTCoreOperationQuery.java.patch node_modules/@ledgerhq/react-native-ledger-core/android/src/main/java/com/ledger/reactnative/RCTCoreOperationQuery.java
@@ -14,14 +22,13 @@ cd $(dirname $0)/..
 rm -rf "node_modules/react-native-tcp/ios/CocoaAsyncSocket"
 
 
-rn-nodeify --hack
 
 # issue: https://github.com/WalletConnect/walletconnect-monorepo/issues/595
 # manually shim
 #sed -i -- 's/require("crypto")/require("react-native-crypto")/g' node_modules/@walletconnect/randombytes/dist/cjs/node/index.js
 
 ## hack to remove module not found
-#sed -i -- "s/require('module').builtinModules,//g" node_modules/stack-utils/index.js
+# sed -i -- "s/require('module').builtinModules,//g" node_modules/stack-utils/index.js
 
 
 # Create the dev .env file with APP_NAME if it doesn't exist

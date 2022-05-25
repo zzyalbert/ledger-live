@@ -133,6 +133,7 @@
     "ethereumjs-abi": "^0.6.8",
     "ethereumjs-util": "^7.1.4",
     "expect": "^27.4.6",
+    "express": "^4.17.2",
     "generic-pool": "^3.8.2",
     "invariant": "^2.2.2",
     "isomorphic-ws": "^4.0.1",
