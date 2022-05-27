@@ -286,7 +286,6 @@ export const createAction = (
           // we debounce the UI state to not blink on the UI
           debounce((s: State) => {
             if (s.installingLanguage || s.languageInstallationRequested) {
-              // no debounce for allow manager
               return EMPTY;
             }
 
