@@ -42,7 +42,7 @@ const exec = async (opts: i18nJobOps) => {
           p();
         },
         () => {
-          console.log(`${language} language pack installed.`);
+          console.log(`${language} language pack uninstalled.`);
           p();
         }
       )
