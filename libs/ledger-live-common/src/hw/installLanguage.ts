@@ -28,7 +28,8 @@ export type InstallLanguageEvent =
   }
   | {
     type: "devicePermissionRequested";
-    wording: string; // TODO: <--- 
+  } | {
+    type: "languageInstalled";
   };
 
 const attemptToQuitApp = (transport, appAndVersion?: AppAndVersion): Observable<InstallLanguageEvent> =>
@@ -94,7 +95,7 @@ export default function installLanguage({
 
               const apdus = rawApdus.split(/\r?\n/).filter(Boolean);
 
-              // Gab comment: this will be done with a single apdu in the future IIRC
+              // TODO: in a future FW version, this will be a single apdu
               for (const id of Object.values(languageIds)) {
                 // do we want to reflect this on the UI? do we need to emit events here
                 // what about error handling, maybe unhandled promise rejection might happen
@@ -112,8 +113,7 @@ export default function installLanguage({
               for (let i = 0; i < apdus.length; i++) {
                 if (apdus[i].startsWith("e030")) {
                   subscriber.next({
-                    type: "devicePermissionRequested",
-                    wording: "Aceita ai na moralzinha", // TODO: <---
+                    type: "devicePermissionRequested"
                   });
                 }
 
@@ -133,6 +133,10 @@ export default function installLanguage({
                   progress: (i + 1) / apdus.length,
                 });
               }
+
+              subscriber.next({
+                type: "languageInstalled"
+              });
 
               subscriber.complete();
             }),

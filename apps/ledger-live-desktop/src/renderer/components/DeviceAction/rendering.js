@@ -325,6 +325,61 @@ export const InstallingApp = ({
   );
 };
 
+export const InstallingLanguage = ({
+  progress,
+  type,
+  modelId
+}: {
+  progress: number,
+  type: "light" | "dark",
+  modelId: DeviceModelId
+}) => {
+  const cleanProgress = progress ? Math.round(progress * 100) : null;
+  // TODO: track app install
+  // useEffect(() => {
+  //   const trackingArgs = [
+  //     "In-line app install",
+  //     { appName: appNameToTrack, flow: analyticsPropertyFlow },
+  //   ];
+  //   track(...trackingArgs);
+  // }, [appNameToTrack, analyticsPropertyFlow]);
+  return (
+    <Wrapper id="deviceAction-loading">
+      <Header />
+      <AnimationWrapper modelId={modelId}>
+        <Animation animation={getDeviceAnimation(modelId, type, "installLoading")} />
+      </AnimationWrapper>
+      <Footer>
+        <Title>
+          {/* TODO: traslate */}
+          {"Installing language pack"}
+        </Title>
+        <SubTitle>
+          {/* TODO: translate */}
+        {"The language is being installed no your device"}
+        </SubTitle>
+        {cleanProgress ? <Title>{`${cleanProgress}%`}</Title> : null}
+      </Footer>
+    </Wrapper>
+  );
+};
+
+
+export const LanguageInstalled = () => {
+
+  return (
+    <Wrapper id="deviceAction-languageInstalled">
+      <Header />      
+      <Footer>
+        <Title>
+          {/* TODO: traslate */}
+          {"Language pack successfully installed"}
+        </Title>
+      </Footer>
+    </Wrapper>
+  );
+};
+
 export const renderListingApps = () => (
   <Wrapper id="deviceAction-loading">
     <Header />

@@ -1,12 +1,4 @@
-import {
-  concat,
-  of,
-  EMPTY,
-  interval,
-  Observable,
-  TimeoutError,
-  throwError,
-} from "rxjs";
+import { concat, of, EMPTY, interval, Observable, TimeoutError, throwError } from "rxjs";
 import {
   scan,
   debounce,
@@ -20,20 +12,13 @@ import {
 import { useEffect, useCallback, useState } from "react";
 import { log } from "@ledgerhq/logs";
 import type { DeviceInfo } from "../../types/manager";
-import type { ListAppsResult } from "../../apps/types";
 import { useReplaySubject } from "../../observable";
-import type {
-  InstallLanguageEvent,
-  InstallLanguageRequest,
-} from "../installLanguage";
+import type { InstallLanguageEvent, InstallLanguageRequest } from "../installLanguage";
 import type { Action, Device } from "./types";
 import isEqual from "lodash/isEqual";
 import { ConnectManagerTimeout } from "../../errors";
 import { currentMode } from "./app";
-import {
-  DisconnectedDevice,
-  DisconnectedDeviceDuringOperation,
-} from "@ledgerhq/errors";
+import { DisconnectedDevice, DisconnectedDeviceDuringOperation } from "@ledgerhq/errors";
 import { getDeviceModel } from "@ledgerhq/devices";
 import { Language } from "../../types/languages";
 
@@ -41,20 +26,16 @@ type State = {
   isLoading: boolean;
   requestQuitApp: boolean;
   unresponsive: boolean;
-  allowManagerRequestedWording: string | null | undefined;
-  allowManagerGranted: boolean;
+  languageInstallationRequested?: boolean;
+  installingLanguage?: boolean;
+  languageInstalled?: boolean;
   device: Device | null | undefined;
   deviceInfo: DeviceInfo | null | undefined;
   error: Error | null | undefined;
   progress?: number;
 };
 
-type Result = {
-  device: Device;
-  deviceInfo: DeviceInfo;
-  result: ListAppsResult | null | undefined;
-};
-
+// there's no result for this device action
 type InstallLanguageAction = Omit<Action<Language, State, undefined>, "mapResult">;
 
 type Event =
@@ -68,31 +49,20 @@ type Event =
       device: Device | null | undefined;
     };
 
-const mapResult = ({ deviceInfo, device, result }): Result | null | undefined =>
-  deviceInfo && device
-    ? {
-        device,
-        deviceInfo,
-        result,
-      }
-    : null;
 
 const getInitialState = (device?: Device | null | undefined): State => ({
   isLoading: !!device,
   requestQuitApp: false,
   unresponsive: false,
-  allowManagerRequestedWording: null,
-  allowManagerGranted: false,
   device,
   deviceInfo: null,
   error: null,
 });
 
 const reducer = (state: State, e: Event): State => {
-  debugger;
   switch (e.type) {
     case "unresponsiveDevice":
-      return { ...state, unresponsive: true };
+      return { ...state, unresponsive: true, isLoading: false };
 
     case "deviceChange":
       return getInitialState(e.device);
@@ -103,25 +73,33 @@ const reducer = (state: State, e: Event): State => {
         error: e.error,
         isLoading: false,
       };
-
     case "appDetected":
-      return { ...state, unresponsive: false, requestQuitApp: true };
-
-
+      return { ...state, unresponsive: false, requestQuitApp: true, isLoading: false };
     case "devicePermissionRequested":
       return {
         ...state,
         unresponsive: false,
-        allowManagerRequestedWording: e.wording,
+        languageInstallationRequested: true,
+        isLoading: false,
+      };
+    case "languageInstalled":
+      return {
+        ...state,
+        unresponsive: false,
+        languageInstallationRequested: false,
+        isLoading: false,
+        installingLanguage: false,
+        languageInstalled: true,
       };
 
     case "progress":
       return {
         ...state,
         unresponsive: false,
-        allowManagerRequestedWording: null,
-        allowManagerGranted: true,
-        progress: e.progress
+        languageInstallationRequested: false,
+        isLoading: false,
+        installingLanguage: true,
+        progress: e.progress,
       };
   }
 };
@@ -177,9 +155,7 @@ const implementations = {
           .pipe(
             timeout(DEVICE_POLLING_TIMEOUT),
             catchError((err) => {
-              const productName = getDeviceModel(
-                pollingOnDevice.modelId
-              ).productName;
+              const productName = getDeviceModel(pollingOnDevice.modelId).productName;
               return err instanceof TimeoutError
                 ? of({
                     type: "error",
@@ -267,15 +243,10 @@ const implementations = {
     }).pipe(distinctUntilChanged(isEqual)),
 };
 export const createAction = (
-  installLanuageExec: (
-    arg0: InstallLanguageRequest
-  ) => Observable<InstallLanguageEvent>
+  installLanuageExec: (arg0: InstallLanguageRequest) => Observable<InstallLanguageEvent>
 ): InstallLanguageAction => {
-
-  const installLanguage = (device, language: Language) =>
-    {
-      console.log("installLanguage", {device, language});
-      return concat(
+  const installLanguage = (device, language: Language) => {
+    return concat(
       of({
         type: "deviceChange",
         device,
@@ -293,13 +264,10 @@ export const createAction = (
               })
             )
           )
-    );}
+    );
+  };
 
-  const useHook = (
-    device: Device | null | undefined,
-    language: Language
-  ): State => {
-
+  const useHook = (device: Device | null | undefined, language: Language): State => {
     const [state, setState] = useState(() => getInitialState(device));
     const deviceSubject = useReplaySubject(device);
     useEffect(() => {
@@ -312,12 +280,12 @@ export const createAction = (
       const sub = impl
         .pipe(
           // debounce a bit the connect/disconnect event that we don't need
-          tap(e => console.log("installLanguage event", e)),
+          tap((e: Event) => log("actions-install-language-event", e.type, e)), // tap((e) => console.log("installLanguage event", e)),
           // we gather all events with a reducer into the UI state
-          scan(reducer, getInitialState()), // tap(s => console.log("connectManager state", s)),
+          scan(reducer, getInitialState()),
           // we debounce the UI state to not blink on the UI
           debounce((s: State) => {
-            if (s.allowManagerRequestedWording || s.allowManagerGranted) {
+            if (s.installingLanguage || s.languageInstallationRequested) {
               // no debounce for allow manager
               return EMPTY;
             }
@@ -331,14 +299,13 @@ export const createAction = (
         sub.unsubscribe();
       };
     }, [deviceSubject, language]);
-    
-    
+
     return {
-      ...state
+      ...state,
     };
   };
 
   return {
-    useHook
+    useHook,
   };
 };

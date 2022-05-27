@@ -28,8 +28,6 @@ type Props = {
 };
 
 
-const installLanguageExec = command("installLanguage");
-const installLanguageAction = createAction(getEnv("MOCK") ? mockedEventEmitter : installLanguageExec);
 
 const Dashboard = ({ device, deviceInfo, result, onReset, appsToRestore }: Props) => {
   const { search } = useLocation();
@@ -100,9 +98,6 @@ const Dashboard = ({ device, deviceInfo, result, onReset, appsToRestore }: Props
         appsStoragePercentage={appsStoragePercentage}
         appLength={result ? result.installed.length : 0}
       />
-      <Button onClick={() => setInstallingLanguage(true)}>
-        Aoooba
-      </Button>
       {result ? (
         <AppsList
           device={device}

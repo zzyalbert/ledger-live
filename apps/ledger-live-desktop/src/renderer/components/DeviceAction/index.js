@@ -17,10 +17,13 @@ import type { DeviceModelId } from "@ledgerhq/devices";
 import AutoRepair from "~/renderer/components/AutoRepair";
 import TransactionConfirm from "~/renderer/components/TransactionConfirm";
 import SignMessageConfirm from "~/renderer/components/SignMessageConfirm";
+import InstallLanguageConfirm from "~/renderer/components/InstallLanguageConfirm";
 import useTheme from "~/renderer/hooks/useTheme";
 import { ManagerNotEnoughSpaceError, UpdateYourApp, TransportStatusError } from "@ledgerhq/errors";
 import {
+  LanguageInstalled,
   InstallingApp,
+  InstallingLanguage,
   renderAllowManager,
   renderAllowOpeningApp,
   renderBootloaderStep,
@@ -121,6 +124,9 @@ const DeviceAction = <R, H, P>({
     initSellResult,
     initSellError,
     signMessageRequested,
+    languageInstallationRequested,
+    installingLanguage,
+    languageInstalled,
   } = hookState;
 
   const type = useTheme("colors.palette.type");
@@ -159,6 +165,14 @@ const DeviceAction = <R, H, P>({
     const appName = requestOpenApp;
     const props = { type, modelId, appName, progress, request, analyticsPropertyFlow };
     return <InstallingApp {...props} />;
+  }
+
+  if (installingLanguage) {
+    return <InstallingLanguage progress={progress} type={type} modelId={modelId} />;
+  }
+
+  if (languageInstalled) {
+    return <LanguageInstalled />
   }
 
   if (requiresAppInstallation) {
@@ -331,6 +345,10 @@ const DeviceAction = <R, H, P>({
         signMessageRequested={signMessageRequested}
       />
     );
+  }
+
+  if (languageInstallationRequested) {
+    return <InstallLanguageConfirm device={device} />;
   }
 
   if (typeof deviceStreamingProgress === "number") {
