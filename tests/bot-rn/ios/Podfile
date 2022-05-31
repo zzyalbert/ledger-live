@@ -1,3 +1,4 @@
+require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
 # Use the node resolver because pnpm nests modules.
 def relative_path(module_name)
   module_pathname = Pathname.new File.dirname(`node --print "require.resolve('#{module_name}/package.json')"`)
@@ -31,6 +32,23 @@ ENV["NODE_PATH"] ||= pnpm_hoisted_node_modules + platform_separator + common_nod
 
 target 'LiveBotRN' do
   use_expo_modules!
+  post_integrate do |installer|
+    begin
+      expo_patch_react_imports!(installer)
+    rescue => e
+      Pod::UI.warn e
+    end
+    begin
+      expo_patch_react_imports!(installer)
+    rescue => e
+      Pod::UI.warn e
+    end
+    begin
+      expo_patch_react_imports!(installer)
+    rescue => e
+      Pod::UI.warn e
+    end
+  end
   config = use_native_modules!
 
   use_react_native!(

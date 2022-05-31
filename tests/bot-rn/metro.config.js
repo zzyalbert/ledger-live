@@ -20,6 +20,8 @@ const specificConfig = {
       ...require("node-libs-react-native"),
       fs: require.resolve("react-native-level-fs"),
       net: require.resolve("react-native-tcp"),
+      // just a trick to by pass unresolve module. since there's no polyfill
+      module: require.resolve("react-native-level-fs"),
     },
     // makeMetroConfig adds the "module" field, but we skip it here on purpose
     // because it makes the "react-native-url-polyfill" package consume the

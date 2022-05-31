@@ -22,15 +22,7 @@ type MessageProxySpeculos =
     }
   | { type: "error"; error: string };
 
-const canAccess = (serverToken: string, receivedToken: string) => {
-  if (serverToken === "" || !serverToken || receivedToken === serverToken) {
-    return true;
-  }
-
-  return false;
-};
-
-export const botSpeculosProxy = ({ token, port = 4377, wsPort = 8435 }) => {
+export const botSpeculosProxy = ({ port = 4377, wsPort = 8435 }) => {
   const app = express();
   // app.use(morgan("tiny"));
   app.use(json());
@@ -42,7 +34,6 @@ export const botSpeculosProxy = ({ token, port = 4377, wsPort = 8435 }) => {
   if (!coinapps) {
     throw new Error("COINAPPS is not set");
   }
-  const speculosToken = token || getEnv("BOT_SPECULOS_PROXY_TOKEN");
 
   const websocketServer = new WebSocket.Server({
     port: wsPort,
@@ -84,13 +75,6 @@ export const botSpeculosProxy = ({ token, port = 4377, wsPort = 8435 }) => {
       try {
         switch (message.type) {
           case "open":
-            if (!canAccess(speculosToken, message.data)) {
-              sendToClient(
-                client,
-                JSON.stringify({ type: "error", error: "not authorized" })
-              );
-              client.close();
-            }
             sendToClient(client, JSON.stringify({ type: "opened" }));
             break;
 
@@ -123,9 +107,6 @@ export const botSpeculosProxy = ({ token, port = 4377, wsPort = 8435 }) => {
 
   app.post("/app-candidate", async (req, res) => {
     try {
-      if (!canAccess(speculosToken, req.body.token)) {
-        return res.status(401).send("not authorized");
-      }
       const appCandidates = await listAppCandidates(coinapps);
       const appCandidate = findAppCandidate(appCandidates, req.body);
 
@@ -142,9 +123,6 @@ export const botSpeculosProxy = ({ token, port = 4377, wsPort = 8435 }) => {
 
   app.post("/", async (req, res) => {
     try {
-      if (!canAccess(speculosToken, req.body.token)) {
-        return res.status(401).send("not authorized");
-      }
       const device = await createSpeculosDevice({
         ...req.body,
         seed: seed,
@@ -203,9 +181,6 @@ export const botSpeculosProxy = ({ token, port = 4377, wsPort = 8435 }) => {
 
   app.delete("/:id", async (req, res) => {
     try {
-      if (!canAccess(speculosToken, req.body.token)) {
-        return res.status(401).send("not authorized");
-      }
       await releaseSpeculosDevice(req.params.id);
 
       return res.json(`${req.params.id} is destroyed`);
