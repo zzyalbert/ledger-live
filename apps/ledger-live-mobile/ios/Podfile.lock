@@ -2,7 +2,6 @@ PODS:
   - Adjust (4.29.6):
     - Adjust/Core (= 4.29.6)
   - Adjust/Core (4.29.6)
-  - Analytics (4.1.6)
   - boost (1.76.0)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
@@ -486,9 +485,6 @@ PODS:
     - React-perflogger (= 0.67.3)
   - ReactNativeART (1.2.0):
     - React
-  - RNAnalytics (1.5.3):
-    - Analytics
-    - React-Core
   - RNCAsyncStorage (1.17.4):
     - React-Core
   - RNCClipboard (1.5.1):
@@ -559,9 +555,14 @@ PODS:
   - SDWebImageWebPCoder (0.8.4):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
+  - segment-analytics-react-native (2.2.1):
+    - React-Core
+    - sovran-react-native
   - Sentry (7.11.0):
     - Sentry/Core (= 7.11.0)
   - Sentry/Core (7.11.0)
+  - sovran-react-native (0.2.8):
+    - React-Core
   - TcpSockets (4.0.0):
     - React
   - Yoga (1.14.0)
@@ -655,7 +656,6 @@ DEPENDENCIES:
   - "React-runtimeexecutor (from `../../../node_modules/.pnpm/react-native@0.67.3_shn3lkepuadv4od4dudas6ijbq/node_modules/react-native/ReactCommon/runtimeexecutor`)"
   - "ReactCommon/turbomodule/core (from `../../../node_modules/.pnpm/react-native@0.67.3_shn3lkepuadv4od4dudas6ijbq/node_modules/react-native/ReactCommon`)"
   - "ReactNativeART (from `../../../node_modules/.pnpm/@react-native-community+art@1.2.0_jtrxi44z2zn3egoyupbz6wol6a/node_modules/@react-native-community/art`)"
-  - "RNAnalytics (from `../../../node_modules/.pnpm/@segment+analytics-react-native@1.5.3/node_modules/@segment/analytics-react-native`)"
   - "RNCAsyncStorage (from `../../../node_modules/.pnpm/@react-native-async-storage+async-storage@1.17.4_react-native@0.67.3/node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../../../node_modules/.pnpm/@react-native-community+clipboard@1.5.1_jtrxi44z2zn3egoyupbz6wol6a/node_modules/@react-native-community/clipboard`)"
   - "RNCMaskedView (from `../../../node_modules/.pnpm/@react-native-masked-view+masked-view@0.2.6_jtrxi44z2zn3egoyupbz6wol6a/node_modules/@react-native-masked-view/masked-view`)"
@@ -672,13 +672,14 @@ DEPENDENCIES:
   - "RNShare (from `../../../node_modules/.pnpm/react-native-share@6.5.0/node_modules/react-native-share`)"
   - "RNSVG (from `../../../node_modules/.pnpm/react-native-svg@12.3.0_jtrxi44z2zn3egoyupbz6wol6a/node_modules/react-native-svg`)"
   - "RNVectorIcons (from `../../../node_modules/.pnpm/react-native-vector-icons@8.1.0/node_modules/react-native-vector-icons`)"
+  - "segment-analytics-react-native (from `../../../node_modules/.pnpm/@segment+analytics-react-native@2.2.1_jtrxi44z2zn3egoyupbz6wol6a/node_modules/@segment/analytics-react-native`)"
+  - "sovran-react-native (from `../../../node_modules/.pnpm/@segment+sovran-react-native@0.2.8_jtrxi44z2zn3egoyupbz6wol6a/node_modules/@segment/sovran-react-native`)"
   - "TcpSockets (from `../../../node_modules/.pnpm/react-native-tcp@4.0.0_react-native@0.67.3/node_modules/react-native-tcp`)"
   - "Yoga (from `../../../node_modules/.pnpm/react-native@0.67.3_shn3lkepuadv4od4dudas6ijbq/node_modules/react-native/ReactCommon/yoga`)"
 
 SPEC REPOS:
   trunk:
     - Adjust
-    - Analytics
     - CocoaAsyncSocket
     - Firebase
     - FirebaseABTesting
@@ -823,8 +824,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/.pnpm/react-native@0.67.3_shn3lkepuadv4od4dudas6ijbq/node_modules/react-native/ReactCommon"
   ReactNativeART:
     :path: "../../../node_modules/.pnpm/@react-native-community+art@1.2.0_jtrxi44z2zn3egoyupbz6wol6a/node_modules/@react-native-community/art"
-  RNAnalytics:
-    :path: "../../../node_modules/.pnpm/@segment+analytics-react-native@1.5.3/node_modules/@segment/analytics-react-native"
   RNCAsyncStorage:
     :path: "../../../node_modules/.pnpm/@react-native-async-storage+async-storage@1.17.4_react-native@0.67.3/node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
@@ -857,6 +856,10 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/.pnpm/react-native-svg@12.3.0_jtrxi44z2zn3egoyupbz6wol6a/node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../../../node_modules/.pnpm/react-native-vector-icons@8.1.0/node_modules/react-native-vector-icons"
+  segment-analytics-react-native:
+    :path: "../../../node_modules/.pnpm/@segment+analytics-react-native@2.2.1_jtrxi44z2zn3egoyupbz6wol6a/node_modules/@segment/analytics-react-native"
+  sovran-react-native:
+    :path: "../../../node_modules/.pnpm/@segment+sovran-react-native@0.2.8_jtrxi44z2zn3egoyupbz6wol6a/node_modules/@segment/sovran-react-native"
   TcpSockets:
     :path: "../../../node_modules/.pnpm/react-native-tcp@4.0.0_react-native@0.67.3/node_modules/react-native-tcp"
   Yoga:
@@ -864,7 +867,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Adjust: 94f1c99429fb2a7ebe530294fd66a88d63a54922
-  Analytics: eefe524436f904b8bb3f8c8c3425280e43b34efc
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
@@ -947,7 +949,6 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: af1946623656f9c5fd64ca6f36f3863516193446
   ReactCommon: 650e33cde4fb7d36781cd3143f5276da0abb2f96
   ReactNativeART: 78edc68dd4a1e675338cd0cd113319cf3a65f2ab
-  RNAnalytics: 6fc4977ed662251d8a0066422aed1d1a5f697caf
   RNCAsyncStorage: 9367a646dc24e3ab7b6874d79bc1bfd0832dce58
   RNCClipboard: 41d8d918092ae8e676f18adada19104fa3e68495
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
@@ -966,7 +967,9 @@ SPEC CHECKSUMS:
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: f93010f3f6c031e2f8fb3081ca4ee6966c539815
+  segment-analytics-react-native: 09f83d4183f4c3f14cd9ef577fe0dc59eeab6e89
   Sentry: 0c5cd63d714187b4a39c331c1f0eb04ba7868341
+  sovran-react-native: e4064b633fd8232055d003460d5816dff87ba8cc
   TcpSockets: 4ef55305239923b343ed0a378b1fac188b1373b0
   Yoga: 90dcd029e45d8a7c1ff059e8b3c6612ff409061a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
