@@ -12,6 +12,9 @@ import WebSocket from "ws";
 import "./log-setup";
 import { getEnv } from "../env";
 
+import fs from "fs";
+import path from "path";
+
 const devicesList: Record<string, SpeculosTransport> = {};
 const clientList: Record<string, WebSocket> = {};
 
@@ -189,6 +192,26 @@ export const botSpeculosProxy = ({ port = 4377, wsPort = 8435 }) => {
       return res.status(500).json({ error: e.message });
     }
   });
+
+  app.post("/logs", async(req, res) => {
+    try {
+      const BOT_REPORT_FOLDER = getEnv("BOT_REPORT_FOLDER");
+
+      if (!req.body.title || !req.body.data) {
+        return res.status(500).json({message: "data or title is empty"})
+      }
+
+      await fs.promises.writeFile(
+        path.join(BOT_REPORT_FOLDER, req.body.title),
+        req.body.data,
+        "utf-8"
+      )
+      return res.status(200);
+    } catch (e: any) {
+      console.error(e.message);
+      return res.status(500).json({ error: e.message });
+    }
+  })
 
   app.listen(port);
 };

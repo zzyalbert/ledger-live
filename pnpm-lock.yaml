@@ -15,17 +15,10 @@ importers:
   .:
     specifiers:
       '@changesets/cli': ^2.21.1
-      '@jest/reporters': ^28.1.0
       create-release-hash: workspace:*
-      jest-config: ^28.1.0
-      jest-environment-node: ^28.1.0
       migrate-branch: workspace:*
       pnpm-utils: workspace:*
       turbo: ^1.2.9
-    dependencies:
-      '@jest/reporters': 28.1.0
-      jest-config: 28.1.0
-      jest-environment-node: 28.1.0
     devDependencies:
       '@changesets/cli': 2.22.0
       create-release-hash: link:tools/create-release-hash
@@ -9062,6 +9055,7 @@ packages:
     transitivePeerDependencies:
       - metro
       - supports-color
+    dev: true
 
   /@jest/expect/28.1.0_metro@0.67.0:
     resolution: {integrity: sha512-be9ETznPLaHOmeJqzYNIXv1ADEzENuQonIoobzThOYPuK/6GhrWNIJDVTgBLCrz3Am73PyEU2urQClZp0hLTtA==}
@@ -9146,6 +9140,7 @@ packages:
     transitivePeerDependencies:
       - metro
       - supports-color
+    dev: true
 
   /@jest/globals/28.1.0_metro@0.67.0:
     resolution: {integrity: sha512-3m7sTg52OTQR6dPhsEQSxAvU+LOBbMivZBwOvKEZ+Rb+GyxVnXi9HKgOTYkx/S99T8yvh17U4tNNJPIEQmtwYw==}
@@ -9338,6 +9333,7 @@ packages:
     transitivePeerDependencies:
       - metro
       - supports-color
+    dev: true
 
   /@jest/reporters/28.1.0_metro@0.67.0:
     resolution: {integrity: sha512-qxbFfqap/5QlSpIizH9c/bFCDKsQlM4uAKSOvZrP+nIdrjqre3FmKzpTtYyhsaVcOSNK7TTt2kjm+4BJIjysFA==}
@@ -9521,6 +9517,7 @@ packages:
       slash: 3.0.0
     transitivePeerDependencies:
       - metro
+    dev: true
 
   /@jest/test-sequencer/28.1.0_metro@0.67.0:
     resolution: {integrity: sha512-tZCEiVWlWNTs/2iK9yi6o3AlMfbbYgV4uuZInSVdzZ7ftpHZhCMuhvk2HLYhCZzLgPFQ9MnM1YaxMnh3TILFiQ==}
@@ -9675,6 +9672,7 @@ packages:
     transitivePeerDependencies:
       - metro
       - supports-color
+    dev: true
 
   /@jest/transform/28.1.0_metro@0.67.0:
     resolution: {integrity: sha512-omy2xe5WxlAfqmsTjTPxw+iXRTRnf+NtX0ToG+4S0tABeb4KsKmPUHq5UBuwunHg3tJRwgEQhEp0M/8oiatLEA==}
@@ -19235,7 +19233,7 @@ packages:
   /axios/0.21.4:
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
     dependencies:
-      follow-redirects: 1.15.0
+      follow-redirects: 1.15.0_debug@4.3.4
     transitivePeerDependencies:
       - debug
     dev: false
@@ -19543,6 +19541,7 @@ packages:
     transitivePeerDependencies:
       - metro
       - supports-color
+    dev: true
 
   /babel-jest/28.1.0_epmq4ny5eiwbyxkub5iqcapase:
     resolution: {integrity: sha512-zNKk0yhDZ6QUwfxh9k07GII6siNGMJWVUU49gmFj5gfdqDKLqa2RArXOF2CODp4Dr7dLxN2cvAV+667dGJ4b4w==}
@@ -27874,16 +27873,6 @@ packages:
       tabbable: 5.3.2
     dev: false
 
-  /follow-redirects/1.15.0:
-    resolution: {integrity: sha512-aExlJShTV4qOUOL7yF1U5tvLCB0xQuudbf6toyYA0E/acBNw71mvjFTnLaRp50aQaYocMR0a/RMMBIHeZnGyjQ==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-    dev: false
-
   /follow-redirects/1.15.0_debug@4.3.2:
     resolution: {integrity: sha512-aExlJShTV4qOUOL7yF1U5tvLCB0xQuudbf6toyYA0E/acBNw71mvjFTnLaRp50aQaYocMR0a/RMMBIHeZnGyjQ==}
     engines: {node: '>=4.0'}
@@ -31194,6 +31183,7 @@ packages:
     transitivePeerDependencies:
       - metro
       - supports-color
+    dev: true
 
   /jest-circus/28.1.0_metro@0.67.0:
     resolution: {integrity: sha512-rNYfqfLC0L0zQKRKsg4n4J+W1A2fbyGH7Ss/kDIocp9KXD9iaL111glsLu7+Z7FHuZxwzInMDXq+N1ZIBkI/TQ==}
@@ -31537,45 +31527,6 @@ packages:
       - supports-color
       - utf-8-validate
     dev: true
-
-  /jest-config/28.1.0:
-    resolution: {integrity: sha512-aOV80E9LeWrmflp7hfZNn/zGA4QKv/xsn2w8QCBP0t0+YqObuCWTSgNbHJ0j9YsTuCO08ZR/wsvlxqqHX20iUA==}
-    engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
-    peerDependencies:
-      '@types/node': '*'
-      ts-node: '>=9.0.0'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      ts-node:
-        optional: true
-    dependencies:
-      '@babel/core': 7.17.10
-      '@jest/test-sequencer': 28.1.0
-      '@jest/types': 28.1.0
-      babel-jest: 28.1.0_@babel+core@7.17.10
-      chalk: 4.1.2
-      ci-info: 3.3.1
-      deepmerge: 4.2.2
-      glob: 7.2.0
-      graceful-fs: 4.2.10
-      jest-circus: 28.1.0
-      jest-environment-node: 28.1.0
-      jest-get-type: 28.0.2
-      jest-regex-util: 28.0.2
-      jest-resolve: 28.1.0
-      jest-runner: 28.1.0
-      jest-util: 28.1.0
-      jest-validate: 28.1.0
-      micromatch: 4.0.5
-      parse-json: 5.2.0
-      pretty-format: 28.1.0
-      slash: 3.0.0
-      strip-json-comments: 3.1.1
-    transitivePeerDependencies:
-      - metro
-      - supports-color
-    dev: false
 
   /jest-config/28.1.0_@types+node@14.18.17:
     resolution: {integrity: sha512-aOV80E9LeWrmflp7hfZNn/zGA4QKv/xsn2w8QCBP0t0+YqObuCWTSgNbHJ0j9YsTuCO08ZR/wsvlxqqHX20iUA==}
@@ -32783,6 +32734,7 @@ packages:
     transitivePeerDependencies:
       - metro
       - supports-color
+    dev: true
 
   /jest-runner/28.1.0_metro@0.67.0:
     resolution: {integrity: sha512-FBpmuh1HB2dsLklAlRdOxNTTHKFR6G1Qmd80pVDvwbZXTriqjWqjei5DKFC1UlM732KjYcE6yuCdiF0WUCOS2w==}
@@ -32979,6 +32931,7 @@ packages:
     transitivePeerDependencies:
       - metro
       - supports-color
+    dev: true
 
   /jest-runtime/28.1.0_metro@0.67.0:
     resolution: {integrity: sha512-wNYDiwhdH/TV3agaIyVF0lsJ33MhyujOe+lNTUiolqKt8pchy1Hq4+tDMGbtD5P/oNLA3zYrpx73T9dMTOCAcg==}
@@ -33166,6 +33119,7 @@ packages:
     transitivePeerDependencies:
       - metro
       - supports-color
+    dev: true
 
   /jest-snapshot/28.1.0_metro@0.67.0:
     resolution: {integrity: sha512-ex49M2ZrZsUyQLpLGxQtDbahvgBjlLPgklkqGM0hq/F7W/f8DyqZxVHjdy19QKBm4O93eDp+H5S23EiTbbUmHw==}

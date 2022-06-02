@@ -69,6 +69,14 @@ export const releaseSpeculosDevice = async (id: string): Promise<any> => {
   }
 };
 
+export const logFile = async (title: string, body: string) => {
+  await network({
+    method: "POST",
+    url: `${getSpeculosHttp()}/logs`,
+    data: { title, data: body },
+  });
+};
+
 registerTransportModule({
   id: "speculos",
   open: (id): Promise<any> | null | undefined => {
