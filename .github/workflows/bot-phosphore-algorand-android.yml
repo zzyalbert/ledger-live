@@ -28,14 +28,12 @@ jobs:
     runs-on: ${{ needs.start-runner.outputs.label }}
     needs: [start-runner]
     steps:
-      - name: Use specific Java version for sdkmanager to work
-        uses: joschi/setup-jdk@v1
+      - name: setup JDK 1.8
+        uses: actions/setup-java@v1
         with:
-          java-version: 'openjdk8'
-          architecture: 'x64'
-        env:
-          # https://github.com/actions/toolkit/issues/641#issuecomment-728963957
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          java-version: 1.8
+      - name: setup Android SDK
+        uses: android-actions/setup-android@v2.0.6
 
       - name: Set workflow variables
         id: workflow-variables
@@ -89,6 +87,23 @@ jobs:
           cache-dependency-path: "**/pnpm-lock.yaml"
       - name: pull docker image
         run: docker pull ghcr.io/ledgerhq/speculos
+      - name: install tests/bot-rn
+        run: |
+          pnpm i --filter="tests/bot-rn" --filter="ledger-live" --frozen-lockfile
+
+      - name: Pre-fetch Javascript bundle
+        # Prebuild the bundle so that's fast when the app starts.
+        run: |
+          nohup pnpm dev:tests/bot-rn &
+          printf 'Waiting for packager to come online'
+          until curl --output /dev/null --silent --head --fail http://localhost:8081/status; do
+            printf '.'
+            sleep 2
+          done
+          echo "Packager is online! Preparing javascript bundle..."
+          curl --output /dev/null --silent --head --fail "http://localhost:8081/index.bundle?platform=android&dev=true&minify=false&inlineSourceMap=true"
+          echo "...javascript bundle ready."
+
       - name: install and build
         run: |
           pnpm i --filter="live-cli..." --filter="ledger-live" --frozen-lockfile
@@ -100,13 +115,13 @@ jobs:
           VERBOSE_FILE: botreport/logs_speculos.txt
         run: |
           mkdir libs/ledger-live-common/botreport
-          COINAPPS=$PWD/coin-apps pnpm run:cli botSpeculosProxy -p 4337 &
+          nohup COINAPPS=$PWD/coin-apps pnpm run:cli botSpeculosProxy -p 4337 &
       - name: Bot Logger
         env:
           VERBOSE_FILE: botreport/logs.txt
         run: |
           mkdir libs/ledger-live-common/botreport
-          pnpm run:cli botLogProxy -p 8331 &
+          nohup pnpm run:cli botLogProxy -p 8331 &
       - name: build bot
         run: pnpm tests:bot-rn detox build e2e --configuration android
 
