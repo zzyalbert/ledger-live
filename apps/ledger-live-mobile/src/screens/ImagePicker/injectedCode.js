@@ -5,6 +5,9 @@ function codeToInject() {
    * The following line is a hermes directive that allows
    * Function.prototype.toString() to return clear stringified code that can
    * thus be injected.
+   * 
+   * ⚠️ IN DEBUG this doesn't work until you hot reload this file (just save the file and it will work)
+   * see https://github.com/facebook/hermes/issues/612
    *  */ 
   
 
@@ -40,7 +43,7 @@ function codeToInject() {
           0.587 * imageData.data[i + 1] +
           0.114 * imageData.data[i + 2];
         // grayscale
-        gray = Math.floor(gray / 16) * 16;
+        gray = Math.floor(gray / 16) * 16; // are we sure about Math.floor here and not Math.round?
         // color reduction
         imageDataGrayScale.push(gray);
         imageDataGrayScale.push(gray);
@@ -89,4 +92,4 @@ function getFunctionBody(string) {
   return string.substring(string.indexOf("{") + 1, string.lastIndexOf("}"));
 }
 
-export const getInjectedCode = () => getFunctionBody(codeToInject.toString());
+export const injectedCode = getFunctionBody(codeToInject.toString());
