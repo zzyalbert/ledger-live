@@ -4,6 +4,7 @@ import { useRoute } from "@react-navigation/native";
 import { Flex, Text } from "@ledgerhq/native-ui";
 import styled from "styled-components/native";
 import FtsImageProcessor from "./ImageProcessor";
+import { fetchImageBase64 } from "./imageUtils";
 
 type RouteParams = {
   imageUrl?: string;
@@ -32,21 +33,9 @@ export default function ImagePicker() {
       if (!srcImageBase64) {
         if (imageBase64) setSrcImageBase64(imageBase64);
         else if (imageUrl) {
-          fetch(imageUrl)
-            .then(response => response.blob())
-            .then(
-              data =>
-                new Promise((resolve, reject) => {
-                  const reader = new FileReader(); // eslint-disable-line no-undef
-                  reader.onloadend = () => resolve(reader.result);
-                  reader.onerror = reject;
-                  reader.readAsDataURL(data);
-                }),
-            )
-            .then((data: string) => {
-              console.log("obtained image base64", data.slice(0, 30));
-              setSrcImageBase64(data);
-            });
+          fetchImageBase64(imageUrl).then((data: string) => {
+            setSrcImageBase64(data);
+          });
         }
       }
     })();
@@ -54,7 +43,6 @@ export default function ImagePicker() {
 
   const onImageProcessorResult = useCallback(
     ({ resultImageBase64, data }) => {
-      console.log("onImageProcessorResult");
       setResultImageBase64(resultImageBase64);
     },
     [setResultImageBase64],
