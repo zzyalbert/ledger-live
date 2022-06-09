@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Image } from "react-native";
+import { View, Image, ScrollView } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { Flex, Text } from "@ledgerhq/native-ui";
 import styled from "styled-components/native";
@@ -49,12 +49,11 @@ export default function ImagePicker() {
   );
 
   return (
-    <Flex>
-      <Text>hello</Text>
+    <ScrollView>
       {srcImageBase64 && (
         <View>
           <Text>
-            Webview loaded with base64 src: {srcImageBase64.slice(0, 30)}
+            Webview loaded with base64 src: {srcImageBase64.slice(0, 50)}
           </Text>
           <PreviewImage source={{ uri: srcImageBase64 }} />
           <FtsImageProcessor
@@ -69,6 +68,6 @@ export default function ImagePicker() {
           <PreviewImage source={{ uri: resultImageBase64 }} />
         </Flex>
       )}
-    </Flex>
+    </ScrollView>
   );
 }

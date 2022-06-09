@@ -89,4 +89,4 @@ function getFunctionBody(string) {
   return string.substring(string.indexOf("{") + 1, string.lastIndexOf("}"));
 }
 
-export const injectedCode = getFunctionBody(codeToInject.toString());
+export const getInjectedCode = () => getFunctionBody(codeToInject.toString());
