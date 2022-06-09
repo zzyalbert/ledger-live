@@ -9,6 +9,10 @@ type Props = {
   onRawHexResult: (rawHexResult: string) => void;
 };
 
+/**
+ * using a class component here because we need to access some methods from
+ * the parent using a ref
+ *  */
 export default class ImageProcessor extends React.Component<Props> {
   webViewRef: Ref<WebView> = null;
 
