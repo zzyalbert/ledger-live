@@ -8,11 +8,11 @@ import { NavigatorName, ScreenName } from "../const";
 import {
   accountsCountSelector,
   hasLendEnabledAccountsSelector,
+  accountsSelector,
 } from "../reducers/accounts";
 import BottomModal, { Props as ModalProps } from "../components/BottomModal";
 import BottomModalChoice from "../components/BottomModalChoice";
 import { readOnlyModeEnabledSelector } from "../reducers/settings";
-import { accountsSelector } from "../reducers/accounts";
 
 export default function CreateModal({ isOpened, onClose }: ModalProps) {
   const navigation = useNavigation();
@@ -68,9 +68,33 @@ export default function CreateModal({ isOpened, onClose }: ModalProps) {
       }),
     [onNavigate],
   );
+  const onPickImage = useCallback(() => {
+    onNavigate(NavigatorName.Base, { screen: ScreenName.ImagePicker });
+  }, [onNavigate]);
+  const onPickImageWithURL = useCallback(() => {
+    onNavigate(NavigatorName.Base, {
+      screen: ScreenName.ImagePicker,
+      params: {
+        imageUrl:
+          "https://img.phonandroid.com/2022/04/bored-ape-yacht-club.jpg",
+      },
+    });
+  }, [onNavigate]);
 
   return (
     <BottomModal id="CreateModal" isOpened={isOpened} onClose={onClose}>
+      <BottomModalChoice
+        event="TransferSend"
+        title={"Pick image"}
+        onPress={onPickImage}
+        iconName="Brackets"
+      />
+      <BottomModalChoice
+        event="TransferSend"
+        title={"Pick image (url)"}
+        onPress={onPickImageWithURL}
+        iconName="Brackets"
+      />
       <BottomModalChoice
         event="TransferSend"
         title={t("transfer.send.title")}

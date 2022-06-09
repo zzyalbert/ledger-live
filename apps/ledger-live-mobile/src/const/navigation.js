@@ -354,6 +354,9 @@ export const ScreenName = {
 
   DiscoverScreen: "DiscoverScreen",
   Learn: "Learn",
+
+  // Image picker
+  ImagePicker: "ImagePicker",
 };
 
 export const NavigatorName = {

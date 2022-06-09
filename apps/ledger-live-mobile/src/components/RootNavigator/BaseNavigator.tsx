@@ -78,6 +78,7 @@ import BuyDeviceScreen from "../../screens/BuyDeviceScreen";
 import { readOnlyModeEnabledSelector } from "../../reducers/settings";
 import Learn from "../../screens/Learn";
 import ManagerMain from "../../screens/Manager/Manager";
+import ImagePicker from "../../screens/ImagePicker";
 
 export default function BaseNavigator() {
   const { t } = useTranslation();
@@ -556,6 +557,11 @@ export default function BaseNavigator() {
         name={ScreenName.ManagerMain}
         component={ManagerMain}
         options={{ title: "", headerRight: null }}
+      />
+      <Stack.Screen
+        name={ScreenName.ImagePicker}
+        component={ImagePicker}
+        options={{ title: "Image picker" }}
       />
       {Object.keys(families).map(name => {
         const { component, options } = families[name];
