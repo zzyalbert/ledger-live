@@ -1,72 +1,61 @@
-import { Alert, Switch, Text } from "@ledgerhq/native-ui";
-import React, { useCallback, useRef, useState } from "react";
-import { ScrollView } from "react-native";
+import React, { Ref } from "react";
 import { WebView } from "react-native-webview";
 import { injectedCode } from "./injectedCode";
+import { InjectedCodeDebugger } from "./InjectedCodeDebugger";
 
 type Props = {
   srcImageBase64: string;
-  onResult: ({ resultImageBase64: string, data: any }) => void;
+  onBase64PreviewResult: (base64Preview: string) => void;
+  onRawHexResult: (rawHexResult: string) => void;
 };
 
-function InjectedCodeDebugger({ injectedCode }: { injectedCode: string }) {
-  const [sourceVisible, setSourceVisible] = useState(false);
-  const toggleShowSource = useCallback(() => {
-    setSourceVisible(!sourceVisible);
-  }, [setSourceVisible, sourceVisible]);
-  const warningVisible = injectedCode?.trim() === "[bytecode]"; // see https://github.com/facebook/hermes/issues/612
-  return (
-    <>
-      <Switch
-        checked={sourceVisible}
-        onChange={toggleShowSource}
-        label="show injected code"
-      />
-      {sourceVisible && (
-        <ScrollView horizontal>
-          <Text>{injectedCode}</Text>
-        </ScrollView>
-      )}
-      {warningVisible && (
-        <Alert
-          type="error"
-          title="Injected code not properly stringified, please save the injectedCode.js file to trigger a hot reload & it will work fine"
-        />
-      )}
-    </>
-  );
-}
+export default class ImageProcessor extends React.Component<Props> {
+  webViewRef: Ref<WebView> = null;
 
-export default function ImagePicker({ srcImageBase64, onResult }: Props) {
-  const webViewRef = useRef<WebView>(null);
+  handleMessage = ({ nativeEvent: { data } }) => {
+    const { onBase64PreviewResult, onRawHexResult } = this.props;
+    const { type, payload } = JSON.parse(data);
+    switch (type) {
+      case "LOG":
+        console.log("WEBVIEWLOG:", payload);
+        break;
+      case "BASE64_RESULT":
+        onBase64PreviewResult(payload);
+        break;
+      case "RAW_RESULT":
+        onRawHexResult(payload);
+        break;
+      default:
+        break;
+    }
+  };
 
-  const handleMessage = useCallback(
-    ({ nativeEvent: { data } }) => {
-      const { grayScaleBase64, grayData } = JSON.parse(data);
-      onResult({ resultImageBase64: grayScaleBase64, data: grayData });
-    },
-    [onResult],
-  );
-
-  const handleWebviewLoaded = useCallback(() => {
-    webViewRef?.current?.injectJavaScript(`
+  handleWebviewLoaded = ({ nativeEvent: { data } }) => {
+    const { srcImageBase64 } = this.props;
+    this.webViewRef?.injectJavaScript(`
       window.processImage("${srcImageBase64}");
     `);
-  }, [srcImageBase64, webViewRef]);
+  };
 
-  return (
-    <>
-      <InjectedCodeDebugger injectedCode={injectedCode} />
-      <WebView
-        androidLayerType="software"
-        ref={webViewRef}
-        key={injectedCode} // trigger remount (so reload) of webview when source changes in hot reload
-        injectedJavaScript={injectedCode}
-        androidHardwareAccelerationDisabled={true}
-        style={{ height: 0 }}
-        onLoadEnd={handleWebviewLoaded}
-        onMessage={handleMessage}
-      />
-    </>
-  );
+  requestRawResult = () => {
+    this.webViewRef?.injectJavaScript("window.requestRawResult();");
+  };
+
+  render() {
+    return (
+      <>
+        <InjectedCodeDebugger injectedCode={injectedCode} />
+        <WebView
+          androidLayerType="software"
+          ref={c => (this.webViewRef = c)}
+          key={injectedCode} // trigger remount (so reload) of webview when source changes in hot reload
+          injectedJavaScript={injectedCode}
+          androidHardwareAccelerationDisabled={true}
+          style={{ height: 0 }}
+          onLoadEnd={this.handleWebviewLoaded}
+          onMessage={this.handleMessage}
+        />
+      </>
+    );
+  }
 }
