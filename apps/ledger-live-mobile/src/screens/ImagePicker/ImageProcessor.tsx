@@ -34,6 +34,8 @@ export default class ImageProcessor extends React.Component<Props> {
   componentDidUpdate(prevProps: Props) {
     if (prevProps.contrast !== this.props.contrast) this.setContrast();
     if (prevProps.brightness !== this.props.brightness) this.setBrightness();
+    if (prevProps.srcImageBase64 !== this.props.srcImageBase64)
+      this.computeResult();
   }
 
   handleMessage = ({ nativeEvent: { data } }) => {
@@ -77,11 +79,15 @@ export default class ImageProcessor extends React.Component<Props> {
     this.injectJavaScript("window.requestRawResult();");
   };
 
-  handleWebviewLoaded = ({ nativeEvent: { data } }) => {
-    const { srcImageBase64 } = this.props;
+  computeResult = () => {
     this.setBrightness();
     this.setContrast();
     this.processImage();
+  }
+
+  handleWebviewLoaded = () => {
+    const { srcImageBase64 } = this.props;
+    this.computeResult();
   };
 
   reloadWebView = () => {

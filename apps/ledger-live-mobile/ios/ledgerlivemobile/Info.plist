@@ -24,6 +24,8 @@
 	<string>The Ledger Live app needs access to your camera to scan QR codes</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow $(PRODUCT_NAME) to use the microphone</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow $(PRODUCT_NAME) to pick a picture in your gallery</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

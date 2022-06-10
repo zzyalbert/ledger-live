@@ -5,10 +5,11 @@ import { Button, Flex, Text } from "@ledgerhq/native-ui";
 import styled from "styled-components/native";
 import ImageProcessor from "./ImageProcessor";
 import { fetchImageBase64 } from "./imageUtils";
+import GalleryPicker from "./GalleryPicker";
+import ImageCropper from "./ImageCropper";
 
 type RouteParams = {
   imageUrl?: string;
-  imageBase64?: string;
 };
 
 const PreviewImage = styled(Image).attrs({
@@ -18,9 +19,34 @@ const PreviewImage = styled(Image).attrs({
   height: 200px;
 `;
 
+type ImageDimensions = {
+  height: number;
+  width: number;
+};
+
+type SrcImage = ImageDimensions & {
+  uri: string;
+};
+
+type CroppedImage = ImageDimensions & {
+  base64URI: string;
+};
+
+type ResultImage = ImageDimensions & {
+  base64URI: string;
+};
+
+function fallbackIsNan(number, fallback) {
+  return isNaN(number) ? fallback : number;
+}
+
 export default function ImagePicker() {
   const imageProcessorRef = useRef<ImageProcessor>(null);
-  const [srcImageBase64, setSrcImageBase64] = useState<string | null>(null);
+  // const [srcImageBase64, setSrcImageBase64] = useState<string | null>(null);
+  const [srcImage, setSrcImage] = useState<SrcImage | null>(null);
+  const [croppedImage, setCroppedImage] = useState<CroppedImage | null>(null);
+  const [resultImage, setResultImage] = useState<ResultImage | null>(null);
+
   const [resultImageBase64, setResultImageBase64] = useState<string | null>(
     null,
   );
@@ -30,20 +56,42 @@ export default function ImagePicker() {
 
   const { params = {} }: { params?: RouteParams } = useRoute();
 
-  const { imageUrl, imageBase64 } = params;
+  const { imageUrl: paramsImageURL } = params;
+
+  /** SOURCE IMAGE HANDLING */
 
   useEffect(() => {
-    (async function loadSource() {
-      if (!srcImageBase64) {
-        if (imageBase64) setSrcImageBase64(imageBase64);
-        else if (imageUrl) {
-          fetchImageBase64(imageUrl).then((data: string) => {
-            setSrcImageBase64(data);
-          });
-        }
-      }
-    })();
-  }, [setSrcImageBase64, srcImageBase64, imageUrl, imageBase64]);
+    if (paramsImageURL) {
+      Image.getSize(
+        paramsImageURL,
+        (width, height) => {
+          setSrcImage({ uri: paramsImageURL, width, height });
+        },
+        error => {
+          console.log("error while Image.getSize of original URL");
+          console.error(error);
+        },
+      );
+    }
+  }, [paramsImageURL]);
+
+  const handleGalleryPickerResult = useCallback(
+    ({ width, height, imageURI }) => {
+      setSrcImage({ width, height, uri: imageURI });
+    },
+    [setSrcImage],
+  );
+
+  /** CROP IMAGE HANDLING */
+
+  const handleCropResult = useCallback(
+    ({ width, height, base64Image }) => {
+      setCroppedImage({ width, height, base64URI: base64Image });
+    },
+    [setCroppedImage],
+  );
+
+  /** RESULT IMAGE HANDLING */
 
   const handleBase64PreviewResult = useCallback(
     data => {
@@ -66,21 +114,39 @@ export default function ImagePicker() {
   return (
     <ScrollView>
       <Flex p={5}>
-        {srcImageBase64 && (
-          <Flex>
-            <Text>
-              Webview loaded with base64 src: {srcImageBase64.slice(0, 50)}
-            </Text>
-            <PreviewImage source={{ uri: srcImageBase64 }} />
-            <ImageProcessor
-              ref={imageProcessorRef}
-              srcImageBase64={srcImageBase64}
-              onBase64PreviewResult={handleBase64PreviewResult}
-              onRawHexResult={handleRawHexResult}
-              contrast={1}
-              brightness={0.5}
+        {!paramsImageURL && (
+          <GalleryPicker onResult={handleGalleryPickerResult} />
+        )}
+        {srcImage?.uri ? (
+          <Flex mt={5}>
+            <PreviewImage
+              source={{ uri: srcImage?.uri }}
+              style={{
+                height: 200,
+                width: fallbackIsNan(
+                  (srcImage.width / srcImage.height) * 200,
+                  200,
+                ),
+              }}
+            />
+            <Flex height={5} />
+            <ImageCropper
+              sourceUri={srcImage.uri}
+              aspectRatio={{ height: 1920, width: 1080 }}
+              style={{ alignSelf: "center", height: 640 / 2, width: 360 / 2 }}
+              onResult={handleCropResult}
             />
           </Flex>
+        ) : null}
+        {croppedImage?.base64URI && (
+          <ImageProcessor
+            ref={imageProcessorRef}
+            srcImageBase64={croppedImage?.base64URI}
+            onBase64PreviewResult={handleBase64PreviewResult}
+            onRawHexResult={handleRawHexResult}
+            contrast={1}
+            brightness={0.5}
+          />
         )}
         {resultImageBase64 && (
           <Flex pt={5}>
