@@ -1,4 +1,4 @@
-import React, { Ref } from "react";
+import React from "react";
 import { Button, Icons } from "@ledgerhq/native-ui";
 import { WebView } from "react-native-webview";
 import { injectedCode } from "./injectedCode";
@@ -83,10 +83,9 @@ export default class ImageProcessor extends React.Component<Props> {
     this.setBrightness();
     this.setContrast();
     this.processImage();
-  }
+  };
 
   handleWebviewLoaded = () => {
-    const { srcImageBase64 } = this.props;
     this.computeResult();
   };
 

@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Image, ScrollView } from "react-native";
+import { Image, ScrollView } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { Button, Flex, Text } from "@ledgerhq/native-ui";
 import styled from "styled-components/native";
 import ImageProcessor from "./ImageProcessor";
-import { fetchImageBase64 } from "./imageUtils";
 import GalleryPicker from "./GalleryPicker";
 import ImageCropper from "./ImageCropper";
 

@@ -1,6 +1,5 @@
 import React, { useCallback, useRef } from "react";
 import { Button, Flex } from "@ledgerhq/native-ui";
-import { StyleProp, View } from "react-native";
 import { CropView } from "react-native-image-crop-tools";
 import { readAsStringAsync, EncodingType } from "expo-file-system";
 
