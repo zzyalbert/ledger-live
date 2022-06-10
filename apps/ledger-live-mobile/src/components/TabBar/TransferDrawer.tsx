@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { isAccountEmpty } from "@ledgerhq/live-common/lib/account";
 
 import { Flex, Icons, Text, Box } from "@ledgerhq/native-ui";
-import { ScrollView, Linking } from "react-native";
+import { ScrollView } from "react-native";
 import { NavigatorName, ScreenName } from "../../const";
 import {
   accountsCountSelector,
@@ -22,7 +22,6 @@ import TransferButton from "./TransferButton";
 import BuyDeviceBanner, { IMAGE_PROPS_SMALL_NANO } from "../BuyDeviceBanner";
 import SetupDeviceBanner from "../components/SetupDeviceBanner";
 import { track, TrackScreen, useAnalytics } from "../../analytics";
-import { urls } from "../../config/urls";
 import { useCurrentRouteName } from "../../helpers/routeHooks";
 
 export default function TransferDrawer({ onClose }: ModalProps) {
@@ -105,8 +104,11 @@ export default function TransferDrawer({ onClose }: ModalProps) {
 
   const onManageCard = useCallback(() => {
     trackClick("Manage Card");
-    Linking.openURL(urls.manageClCard);
-  }, [trackClick]);
+    onNavigate(ScreenName.PlatformApp, {
+      platform: "cl-card",
+      name: "CL Card Powered by Ledger",
+    });
+  }, [trackClick, onNavigate]);
 
   const buttons = (
     <>
