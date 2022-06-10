@@ -17,7 +17,7 @@ export function InjectedCodeDebugger({
       <Switch
         checked={sourceVisible}
         onChange={toggleShowSource}
-        label="show injected code"
+        label="Show injected code"
       />
       {sourceVisible && (
         <ScrollView horizontal>

@@ -1,4 +1,5 @@
 import React, { Ref } from "react";
+import { Button, Icons } from "@ledgerhq/native-ui";
 import { WebView } from "react-native-webview";
 import { injectedCode } from "./injectedCode";
 import { InjectedCodeDebugger } from "./InjectedCodeDebugger";
@@ -7,6 +8,20 @@ type Props = {
   srcImageBase64: string;
   onBase64PreviewResult: (base64Preview: string) => void;
   onRawHexResult: (rawHexResult: string) => void;
+  /**
+   * number >= 0
+   *  - 0:  full black
+   *  - 1:  original brightness
+   *  - >1: brighter than the original
+   * */
+  brightness: number;
+  /**
+   * number >= 0
+   *  - 0:  full black
+   *  - 1:  original contrast
+   *  - >1: more contrasted than the original
+   * */
+  contrast: number;
 };
 
 /**
@@ -15,6 +30,11 @@ type Props = {
  *  */
 export default class ImageProcessor extends React.Component<Props> {
   webViewRef: Ref<WebView> = null;
+
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.contrast !== this.props.contrast) this.setContrast();
+    if (prevProps.brightness !== this.props.brightness) this.setBrightness();
+  }
 
   handleMessage = ({ nativeEvent: { data } }) => {
     const { onBase64PreviewResult, onRawHexResult } = this.props;
@@ -34,27 +54,58 @@ export default class ImageProcessor extends React.Component<Props> {
     }
   };
 
-  handleWebviewLoaded = ({ nativeEvent: { data } }) => {
+  injectJavaScript = (script: string) => {
+    this.webViewRef?.injectJavaScript(script);
+  };
+
+  processImage = () => {
     const { srcImageBase64 } = this.props;
-    this.webViewRef?.injectJavaScript(`
-      window.processImage("${srcImageBase64}");
-    `);
+    this.injectJavaScript(`window.processImage("${srcImageBase64}");`);
+  };
+
+  setBrightness = () => {
+    const { brightness } = this.props;
+    this.injectJavaScript(`window.setImageBrightness(${brightness});`);
+  };
+
+  setContrast = () => {
+    const { contrast } = this.props;
+    this.injectJavaScript(`window.setImageContrast(${contrast});`);
   };
 
   requestRawResult = () => {
-    this.webViewRef?.injectJavaScript("window.requestRawResult();");
+    this.injectJavaScript("window.requestRawResult();");
+  };
+
+  handleWebviewLoaded = ({ nativeEvent: { data } }) => {
+    const { srcImageBase64 } = this.props;
+    this.setBrightness();
+    this.setContrast();
+    this.processImage();
+  };
+
+  reloadWebView = () => {
+    this.webViewRef?.reload();
   };
 
   render() {
     return (
       <>
         <InjectedCodeDebugger injectedCode={injectedCode} />
+        <Button
+          Icon={Icons.RefreshMedium}
+          type="main"
+          outline
+          mt={3}
+          onPress={this.reloadWebView}
+        >
+          Reload WebView
+        </Button>
         <WebView
-          androidLayerType="software"
           ref={c => (this.webViewRef = c)}
-          key={injectedCode} // trigger remount (so reload) of webview when source changes in hot reload
           injectedJavaScript={injectedCode}
-          androidHardwareAccelerationDisabled={true}
+          androidLayerType="software"
+          androidHardwareAccelerationDisabled
           style={{ height: 0 }}
           onLoadEnd={this.handleWebviewLoaded}
           onMessage={this.handleMessage}

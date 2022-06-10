@@ -65,35 +65,39 @@ export default function ImagePicker() {
 
   return (
     <ScrollView>
-      {srcImageBase64 && (
-        <View>
-          <Text>
-            Webview loaded with base64 src: {srcImageBase64.slice(0, 50)}
-          </Text>
-          <PreviewImage source={{ uri: srcImageBase64 }} />
-          <ImageProcessor
-            ref={imageProcessorRef}
-            srcImageBase64={srcImageBase64}
-            onBase64PreviewResult={handleBase64PreviewResult}
-            onRawHexResult={handleRawHexResult}
-          />
-        </View>
-      )}
-      {resultImageBase64 && (
-        <Flex>
-          <Text>result:</Text>
-          <PreviewImage source={{ uri: resultImageBase64 }} />
-          <Button type="main" onPress={requestRawResult}>
-            Request & display (shortened) hex data
-          </Button>
-          {resultImageRawHex && (
-            <>
-              <Text>Raw result:</Text>
-              <Text>{resultImageRawHex.slice(0, 2000)}</Text>
-            </>
-          )}
-        </Flex>
-      )}
+      <Flex p={5}>
+        {srcImageBase64 && (
+          <Flex>
+            <Text>
+              Webview loaded with base64 src: {srcImageBase64.slice(0, 50)}
+            </Text>
+            <PreviewImage source={{ uri: srcImageBase64 }} />
+            <ImageProcessor
+              ref={imageProcessorRef}
+              srcImageBase64={srcImageBase64}
+              onBase64PreviewResult={handleBase64PreviewResult}
+              onRawHexResult={handleRawHexResult}
+              contrast={1}
+              brightness={0.5}
+            />
+          </Flex>
+        )}
+        {resultImageBase64 && (
+          <Flex pt={5}>
+            <Text variant="h3">result:</Text>
+            <PreviewImage source={{ uri: resultImageBase64 }} />
+            <Button type="main" onPress={requestRawResult}>
+              Request & display (shortened) hex data
+            </Button>
+            {resultImageRawHex && (
+              <>
+                <Text>Raw result:</Text>
+                <Text>{resultImageRawHex.slice(0, 2000)}</Text>
+              </>
+            )}
+          </Flex>
+        )}
+      </Flex>
     </ScrollView>
   );
 }
