@@ -10,6 +10,8 @@ import ForceTheme from "./theme/ForceTheme";
 
 import buyImgSource from "../images/illustration/Shared/_NanoXTop.png";
 import setupImgSource from "../images/illustration/Shared/_NanoXBoxTop.png";
+import { useCurrentRouteName } from "../helpers/routeHooks";
+import { track } from "../analytics";
 
 type Props = {
   topLeft?: JSX.Element | null;
@@ -69,6 +71,8 @@ export default function BuyDeviceBanner({
 }: Props) {
   const { t } = useTranslation();
   const { navigate } = useNavigation();
+  const currentRoute = useCurrentRouteName();
+
   const handleOnPress = useCallback(() => {
     navigate(ScreenName.BuyDeviceScreen);
   }, [navigate]);
@@ -80,6 +84,16 @@ export default function BuyDeviceBanner({
       },
     });
   }, [navigate]);
+
+  const pressMessage = useCallback(() => {
+    track("message_clicked", {
+      message: "I already have a device, set it up",
+      screen: currentRoute,
+      // TODO analytics : link: "",
+      currency: eventProperties?.currency,
+    });
+    handleSetupCtaOnPress();
+  }, [currentRoute, handleSetupCtaOnPress, eventProperties]);
 
   const imgScale = imageScale / PixelRatio.get();
 
@@ -147,7 +161,7 @@ export default function BuyDeviceBanner({
             type="color"
             Icon={Icons.ArrowRightMedium}
             iconPosition="right"
-            onPress={handleSetupCtaOnPress}
+            onPress={() => pressMessage()}
           >
             {t("buyDevice.setupCta")}
           </Link>
