@@ -18,8 +18,9 @@ import { readOnlyModeEnabledSelector } from "../../reducers/settings";
 import TransferButton from "./TransferButton";
 import BuyDeviceBanner, { IMAGE_PROPS_SMALL_NANO } from "../BuyDeviceBanner";
 import SetupDeviceBanner from "../components/SetupDeviceBanner";
-import { useAnalytics } from "../../analytics";
+import { TrackScreen, useAnalytics } from "../../analytics";
 import { urls } from "../../config/urls";
+import { useCurrentRouteName } from "../../helpers/routeHooks";
 
 export default function TransferDrawer({ onClose }: ModalProps) {
   const navigation = useNavigation();
@@ -206,8 +207,16 @@ export default function TransferDrawer({ onClose }: ModalProps) {
     [page],
   );
 
+  const currentRoute = useCurrentRouteName();
+
   return (
     <Flex flexDirection="column" alignItems="flex-start" p={7} pt={9}>
+      <TrackScreen
+        category="ReadOnly"
+        name="Trade"
+        source={currentRoute}
+        type="drawer"
+      />
       <ScrollView
         alwaysBounceVertical={false}
         style={{ opacity: readOnlyModeEnabled ? 0.3 : 1, width: "100%" }}
