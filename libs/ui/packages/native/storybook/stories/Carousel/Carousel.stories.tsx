@@ -5,7 +5,9 @@ import { action } from "@storybook/addon-actions";
 import { storiesOf } from "../storiesOf";
 import { Flex, Carousel, Text, Button } from "../../../src";
 import StoriesIndicator from "../../../src/components/Navigation/StoriesIndicator";
-
+import { onChange } from "react-native-reanimated";
+import Video from "react-native-video";
+//const testa = require("./../../../../../../../../Downloads/dollar11.mp4");
 const description = `
 ### A simple responsive carousel.
 
@@ -61,6 +63,10 @@ const Item = ({ label }: { label: string }) => (
     </Text>
   </ChildContainer>
 );
+
+const TestV = () => {
+  return <ChildContainer></ChildContainer>;
+};
 
 const Default = (): JSX.Element => {
   return (
@@ -188,6 +194,39 @@ const CustomIndicator = (): JSX.Element => {
   );
 };
 
+const MyTest = (): JSX.Element => {
+  // const onChange = (index) => {};
+  const aaa = require("../../../../../../../apps/ledger-live-mobile/assets/videos/NanoX_LL_black.mp4");
+  return (
+    <Carousel
+      scrollOnSidePress={boolean("scrollOnSidePress", true)}
+      autoDelay={number("autoDelay", 5000)}
+      restartAfterEnd={boolean("restartAfterEnd", false)}
+      IndicatorComponent={StoriesIndicator}
+      onOverflow={action("onOverflow")}
+      //onChange={onChange}
+      scrollViewProps={{
+        style: {
+          width: "100%",
+        },
+      }}
+      slideIndicatorContainerProps={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        px: 7,
+      }}
+    >
+      <Video source={aaa} style={{ width: 300, height: 300 }} />
+      <Item label="neutral" />
+      <Item label="success" />
+      <Item label="warning" />
+      <Item label="error" />
+    </Carousel>
+  );
+};
+
 storiesOf((story) =>
   story("Carousel", module)
     .add("Default", Default, {
@@ -201,5 +240,6 @@ storiesOf((story) =>
     .add("AutoDelay", AutoDelay)
     .add("WithProps", WithProps)
     .add("Controlled", Controlled)
-    .add("CustomIndicator - Story", CustomIndicator),
+    .add("CustomIndicator - Story", CustomIndicator)
+    .add("MyTest", MyTest),
 );
