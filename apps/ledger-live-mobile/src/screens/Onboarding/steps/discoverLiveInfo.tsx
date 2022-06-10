@@ -17,8 +17,11 @@ import { Image, ImageProps } from "react-native";
 import { completeOnboarding, setReadOnlyMode } from "../../../actions/settings";
 
 import { NavigatorName, ScreenName } from "../../../const";
-import { screen } from "../../../analytics";
-import { usePreviousRouteName } from "../../../helpers/routeHooks";
+import { screen, track } from "../../../analytics";
+import {
+  useCurrentRouteName,
+  usePreviousRouteName,
+} from "../../../helpers/routeHooks";
 
 const slidesImages = [
   require("../../../../assets/images/onboarding/stories/slide1.png"),
@@ -63,6 +66,18 @@ const Item = ({
       screen: NavigatorName.Main,
     });
   }, [navigation]);
+
+  const currentRoute = useCurrentRouteName();
+
+  const onClick = useCallback(
+    (value: string) => {
+      track("button_clicked", {
+        button: value,
+        screen: currentRoute,
+      });
+    },
+    [currentRoute],
+  );
 
   return (
     <Flex flex={1} backgroundColor={`background.main`}>
@@ -109,10 +124,24 @@ const Item = ({
       </Box>
       {displayNavigationButtons && (
         <Box position={"absolute"} bottom={0} width={"100%"} px={6} pb={10}>
-          <Button onPress={exploreLedger} type={"main"} mb={6}>
+          <Button
+            onPress={() => {
+              exploreLedger();
+              onClick("Explore without a device");
+            }}
+            type={"main"}
+            mb={6}
+          >
             {t("onboarding.discoverLive.exploreWithoutADevice")}
           </Button>
-          <Button onPress={buyLedger} type={"shade"} outline={true}>
+          <Button
+            onPress={() => {
+              buyLedger();
+              onClick("Buy a Ledger");
+            }}
+            type={"shade"}
+            outline={true}
+          >
             {t("onboarding.discoverLive.buyALedgerNow")}
           </Button>
         </Box>
