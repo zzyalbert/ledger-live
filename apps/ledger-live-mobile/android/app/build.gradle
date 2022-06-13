@@ -160,6 +160,11 @@ android {
         resValue "string", "build_config_package", "com.ledger.live"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        configurations.all {
+            resolutionStrategy {
+                force "androidx.core:core:$rootProject.ext.androidXCore"
+            }
+        }
     }
     splits {
         abi {
