@@ -1,3 +1,5 @@
+import { EncodingType, readAsStringAsync } from "expo-file-system";
+
 export async function fetchImageBase64(imageUrl: string) {
   return fetch(imageUrl)
     .then(response => response.blob())
@@ -10,4 +12,15 @@ export async function fetchImageBase64(imageUrl: string) {
           reader.readAsDataURL(data);
         }),
     );
+}
+
+export async function loadImageBase64FromURI(
+  fileUri: string,
+  mimeType = "image/jpg",
+) {
+  const base64 = await readAsStringAsync(fileUri, {
+    encoding: EncodingType.Base64,
+  });
+  const fullBase64 = `data:${mimeType};base64, ${base64}`;
+  return fullBase64;
 }

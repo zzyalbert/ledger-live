@@ -1,7 +1,9 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Button, Flex } from "@ledgerhq/native-ui";
 import { CropView } from "react-native-image-crop-tools";
 import { readAsStringAsync, EncodingType } from "expo-file-system";
+import { Platform } from "react-native";
+import { fetchImageBase64, loadImageBase64FromURI } from "./imageUtils";
 
 type Props = {
   sourceUri: string;
@@ -24,19 +26,31 @@ const ImageCropper: React.FC<Props> = props => {
       const { height, width, uri: fileUri } = res;
       // console.log("cropped res", res);
       try {
-        const base64 = await readAsStringAsync(fileUri, {
-          encoding: EncodingType.Base64,
-        });
-        const type = "image/jpg";
-        const fullBase64 = `data:${type};base64, ${base64}`;
+        const base64 = await loadImageBase64FromURI(
+          Platform.OS === "android" ? `file://${fileUri}` : fileUri,
+        );
         // console.log("cropped base64", fullBase64.slice(0, 100));
-        onResult({ width, height, base64Image: fullBase64 });
+        onResult({ width, height, base64Image: base64 });
       } catch (e) {
         console.error(e);
       }
     },
     [onResult],
   );
+
+  // useEffect(() => {
+  //   if (Platform.OS === "android") {
+  //     if (sourceUri.startsWith("file://")) {
+  //       loadImageBase64FromURI(sourceUri).then(base64Image => {
+  //         onResult({ base64Image });
+  //       });
+  //     } else {
+  //       fetchImageBase64(sourceUri).then(base64Image => {
+  //         onResult({ base64Image });
+  //       });
+  //     }
+  //   }
+  // }, []);
 
   const handleSave = useCallback(() => {
     cropViewRef?.current?.saveImage(undefined, 100);
@@ -54,7 +68,7 @@ const ImageCropper: React.FC<Props> = props => {
         aspectRatio={aspectRatio}
       />
       <Button type="main" onPress={handleSave}>
-        save
+        Crop
       </Button>
     </Flex>
   );
