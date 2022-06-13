@@ -79,6 +79,16 @@ const Item = ({
     [currentRoute],
   );
 
+  const pressExplore = useCallback(() => {
+    exploreLedger();
+    onClick("Explore without a device");
+  }, [exploreLedger, onClick]);
+
+  const pressBuy = useCallback(() => {
+    buyLedger();
+    onClick("Buy a Ledger");
+  }, [buyLedger, onClick]);
+
   return (
     <Flex flex={1} backgroundColor={`background.main`}>
       <Svg width="100%" height={102} preserveAspectRatio="xMinYMin slice">
@@ -124,24 +134,10 @@ const Item = ({
       </Box>
       {displayNavigationButtons && (
         <Box position={"absolute"} bottom={0} width={"100%"} px={6} pb={10}>
-          <Button
-            onPress={() => {
-              exploreLedger();
-              onClick("Explore without a device");
-            }}
-            type={"main"}
-            mb={6}
-          >
+          <Button onPress={pressExplore} type={"main"} mb={6}>
             {t("onboarding.discoverLive.exploreWithoutADevice")}
           </Button>
-          <Button
-            onPress={() => {
-              buyLedger();
-              onClick("Buy a Ledger");
-            }}
-            type={"shade"}
-            outline={true}
-          >
+          <Button onPress={pressBuy} type={"shade"} outline={true}>
             {t("onboarding.discoverLive.buyALedgerNow")}
           </Button>
         </Box>
@@ -166,6 +162,13 @@ function DiscoverLiveInfo() {
     [previousRoute],
   );
 
+  const autoChange = useCallback((index: number) => onChange(index, false), [
+    onChange,
+  ]);
+  const manualChange = useCallback((index: number) => onChange(index, true), [
+    onChange,
+  ]);
+
   return (
     <StyledSafeAreaView>
       <Carousel
@@ -182,8 +185,8 @@ function DiscoverLiveInfo() {
         }}
         scrollViewProps={{ scrollEnabled: false }}
         maxDurationOfTap={700}
-        onAutoChange={(index: number) => onChange(index, false)}
-        onManualChange={(index: number) => onChange(index, true)}
+        onAutoChange={autoChange}
+        onManualChange={manualChange}
       >
         {slidesImages.map((image, index) => (
           <Item

@@ -86,11 +86,12 @@ export default function BuyDeviceScreen() {
 
   const handleBack = useCallback(() => {
     navigation.goBack();
-    discreetMode &&
+    if (discreetMode) {
       track("button_clicked", {
         button: "close",
         screen: currentRoute,
       });
+    }
   }, [currentRoute, discreetMode, navigation]);
 
   const setupDevice = useCallback(() => {
@@ -102,12 +103,13 @@ export default function BuyDeviceScreen() {
         screen: ScreenName.OnboardingDeviceSelection,
       },
     });
-    discreetMode &&
+    if (discreetMode) {
       track("message_clicked", {
         message: "I already have a device, set it up now",
         // TODO analytics : link: "",
         screen: currentRoute,
       });
+    }
   }, [
     currentRoute,
     discreetMode,
@@ -124,13 +126,13 @@ export default function BuyDeviceScreen() {
 
   return (
     <StyledSafeAreaView>
-      {discreetMode && (
+      {discreetMode ? (
         <TrackScreen
           category="ReadOnly"
           name="Upsell Nano"
           source={currentRoute}
         />
-      )}
+      ) : null}
       <Flex
         flexDirection="row"
         alignItems="center"

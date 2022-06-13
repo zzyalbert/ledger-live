@@ -54,12 +54,13 @@ export default function TransferDrawer({ onClose }: ModalProps) {
 
   const trackClick = useCallback(
     (buttonTitle: string) => {
-      discreetMode &&
+      if (discreetMode) {
         track("button_clicked", {
           button: buttonTitle,
           screen: currentRoute,
           drawer: "trade",
         });
+      }
     },
     [currentRoute, discreetMode],
   );

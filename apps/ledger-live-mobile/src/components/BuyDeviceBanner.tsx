@@ -161,7 +161,7 @@ export default function BuyDeviceBanner({
             type="color"
             Icon={Icons.ArrowRightMedium}
             iconPosition="right"
-            onPress={() => pressMessage()}
+            onPress={pressMessage}
           >
             {t("buyDevice.setupCta")}
           </Link>

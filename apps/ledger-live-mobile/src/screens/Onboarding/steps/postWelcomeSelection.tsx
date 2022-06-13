@@ -137,6 +137,21 @@ function PostWelcomeSelection({
     });
   }, [currentRoute, selectedOption]);
 
+  const pressSetup = useCallback(
+    (data: DataType) => onCardClick(data, "Setup my Ledger"),
+    [onCardClick],
+  );
+
+  const pressExplore = useCallback(
+    (data: DataType) => onCardClick(data, "Explore LL"),
+    [onCardClick],
+  );
+
+  const pressBuy = useCallback(
+    (data: DataType) => onCardClick(data, "Buy a Nano X"),
+    [onCardClick],
+  );
+
   return (
     <Flex flex={1}>
       <TrackScreen
@@ -163,7 +178,7 @@ function PostWelcomeSelection({
             event="Onboarding PostWelcome - Setup Ledger"
             testID={`Onboarding PostWelcome - Selection|SetupLedger`}
             selectedOption={selectedOption}
-            onPress={(data: DataType) => onCardClick(data, "Setup my Ledger")}
+            onPress={pressSetup}
             onValidate={setupLedger}
             imageSource={setupLedgerImg}
           />
@@ -174,7 +189,7 @@ function PostWelcomeSelection({
           event="Onboarding PostWelcome - Explore Ledger"
           testID={`Onboarding PostWelcome - Selection|ExploreLedger`}
           selectedOption={selectedOption}
-          onPress={(data: DataType) => onCardClick(data, "Explore LL")}
+          onPress={pressExplore}
           onValidate={exploreLedger}
           imageSource={discoverLiveImg}
         />
@@ -185,7 +200,7 @@ function PostWelcomeSelection({
             event="Onboarding PostWelcome - Buy Nano"
             testID={`Onboarding PostWelcome - Selection|BuyNano`}
             selectedOption={selectedOption}
-            onPress={(data: DataType) => onCardClick(data, "Buy a Nano X")}
+            onPress={pressBuy}
             onValidate={buyLedger}
             imageSource={buyNanoImg}
           />
