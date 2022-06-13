@@ -19,6 +19,7 @@ import proxyStyled from "@ledgerhq/native-ui/components/styled";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PlusMedium } from "@ledgerhq/native-ui/assets/icons";
 import { Currency } from "@ledgerhq/live-common/lib/types";
+import { Storyly } from "storyly-react-native";
 import { useRefreshAccountsOrdering } from "../../actions/general";
 import { accountsSelector } from "../../reducers/accounts";
 import {
@@ -301,6 +302,13 @@ function PortfolioScreen({ navigation }: Props) {
             hidePortfolio={areAccountsEmpty}
           />
         </Box>
+        <Storyly
+          style={{ width: "100%", height: 120 }}
+          ref={ref => {
+            this.storyly = ref;
+          }}
+          storylyId="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2NfaWQiOjY5NDgsImFwcF9pZCI6MTE0MjIsImluc19pZCI6MTIxOTh9.XqNitheri5VPDqebtA4JFu1VucVOHYlryki2TqCb1DQ"
+        />
         <Flex px={6} py={4}>
           <FirmwareUpdateBanner />
         </Flex>
