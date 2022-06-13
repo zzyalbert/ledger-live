@@ -1,3 +1,14 @@
+declare global {
+  interface Window {
+    ReactNativeWebView: any;
+    processImage: (imgBase64: string) => void;
+    setImageBrightness: (val: number) => void;
+    setImageContrast: (val: number) => void;
+    requestRawResult: () => void;
+  }
+}
+
+
 /* This function is meant to be stringified and its body injected in the webview */
 function codeToInject() {
   /* eslint-disable prettier/prettier */
@@ -18,16 +29,16 @@ function codeToInject() {
   /* eslint-disable no-ufezndef */
   /* eslint-disable no-unused-vars */
 
-  const postDataToWebView = data => {
+  const postDataToWebView = (data: any) => {
     window.ReactNativeWebView.postMessage(JSON.stringify(data));
   };
 
   /** helper to log stuff in RN JS thread */
-  const log = data => {
+  const log = (data: any) => {
     postDataToWebView({ type: "LOG", payload: data });
   };
 
-  let image = null;
+  let image: any = null;
   /**
    * Image parameters
    */
@@ -51,15 +62,15 @@ function codeToInject() {
 
       const context = canvas.getContext("2d");
 
+      if(!context) return;
+
       // TODO: fix this: the values are passed properly but the filter seems to not be applied
+      // this doesn't work on safari that's why it doesn't work on iOS
       context.filter = `brightness(${brightness}) contrast(${contrast})`;
       log(context.filter);
       context.drawImage(image, 0, 0);
 
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-      const x = 0;
-      const y = 0;
 
       const imageDataGrayScale = [];
       rawResult = "";
@@ -75,7 +86,7 @@ function codeToInject() {
         // color reduction to 16 levels of gray
 
         rawResult = rawResult.concat((gray16levels / 16).toString(16));
-        // adding hexadecimal value of this pixel
+        // adding hexadecimal value of this pixel 
 
         imageDataGrayScale.push(gray16levels);
         imageDataGrayScale.push(gray16levels);
@@ -95,6 +106,8 @@ function codeToInject() {
 
       const grayContext = grayCanvas.getContext("2d");
 
+      if(!grayContext) return;
+
       grayContext.putImageData(
         new ImageData(grayData, image.width, image.height),
         0,
@@ -107,8 +120,10 @@ function codeToInject() {
         payload: grayScaleBase64,
       });
     } catch (e) {
-      log(e.toString());
-      console.error(e);
+      if(e instanceof Error) {
+        log(e.toString());
+        console.error(e);
+      }
     }
   };
 
@@ -151,8 +166,8 @@ function codeToInject() {
   };
 }
 
-function getFunctionBody(string) {
-  return string.substring(string.indexOf("{") + 1, string.lastIndexOf("}"));
+function getFunctionBody(str: string) {
+  return str.substring(str.indexOf("{") + 1, str.lastIndexOf("}"));
 }
 
 export const injectedCode = getFunctionBody(codeToInject.toString());

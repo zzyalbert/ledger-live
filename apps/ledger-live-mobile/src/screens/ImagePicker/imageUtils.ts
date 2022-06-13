@@ -5,9 +5,9 @@ export async function fetchImageBase64(imageUrl: string) {
     .then(response => response.blob())
     .then(
       data =>
-        new Promise((resolve, reject) => {
+        new Promise<string | undefined>((resolve, reject) => {
           const reader = new FileReader(); // eslint-disable-line no-undef
-          reader.onloadend = () => resolve(reader.result);
+          reader.onloadend = () => resolve(reader.result?.toString());
           reader.onerror = reject;
           reader.readAsDataURL(data);
         }),

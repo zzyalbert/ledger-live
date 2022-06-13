@@ -35,7 +35,7 @@ type ResultImage = ImageDimensions & {
   base64URI: string;
 };
 
-function fallbackIsNan(number, fallback) {
+function fallbackIsNan(number: number, fallback: number): number {
   return isNaN(number) ? fallback : number;
 }
 
@@ -107,7 +107,7 @@ export default function ImagePicker() {
   );
 
   const requestRawResult = useCallback(() => {
-    imageProcessorRef?.current.requestRawResult();
+    imageProcessorRef?.current?.requestRawResult();
   }, [imageProcessorRef]);
 
   return (
