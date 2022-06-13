@@ -118,6 +118,7 @@ export default function ImagePicker() {
         )}
         {srcImage?.uri ? (
           <Flex mt={5}>
+            <Text mt={5} variant="h3">Source image:</Text>
             <PreviewImage
               source={{ uri: srcImage?.uri }}
               style={{
@@ -129,6 +130,7 @@ export default function ImagePicker() {
               }}
             />
             <Flex height={5} />
+            <Text mt={5} variant="h3">Cropping:</Text>
             <ImageCropper
               sourceUri={srcImage.uri}
               aspectRatio={{ height: 1920, width: 1080 }}
@@ -138,18 +140,21 @@ export default function ImagePicker() {
           </Flex>
         ) : null}
         {croppedImage?.base64URI && (
-          <ImageProcessor
-            ref={imageProcessorRef}
-            srcImageBase64={croppedImage?.base64URI}
-            onBase64PreviewResult={handleBase64PreviewResult}
-            onRawHexResult={handleRawHexResult}
-            contrast={1}
-            brightness={0.5}
-          />
+          <>
+            <Text mt={5} variant="h3">Image processing:</Text>
+            <ImageProcessor
+              ref={imageProcessorRef}
+              srcImageBase64={croppedImage?.base64URI}
+              onBase64PreviewResult={handleBase64PreviewResult}
+              onRawHexResult={handleRawHexResult}
+              contrast={1}
+              brightness={1}
+            />
+          </>
         )}
         {resultImageBase64 && (
-          <Flex pt={5}>
-            <Text variant="h3">result:</Text>
+          <Flex>
+            <Text mt={5} variant="h3">result:</Text>
             <PreviewImage source={{ uri: resultImageBase64 }} />
             <Button type="main" onPress={requestRawResult}>
               Request & display (shortened) hex data
