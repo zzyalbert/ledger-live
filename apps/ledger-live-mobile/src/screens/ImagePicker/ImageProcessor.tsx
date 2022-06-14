@@ -25,7 +25,7 @@ export default class ImageProcessor extends React.Component<Props> {
   webViewRef: WebView<{}> | null = null;
 
   componentDidUpdate(prevProps: Props) {
-    if (prevProps.contrast !== this.props.contrast) this.setContrast();
+    if (prevProps.contrast !== this.props.contrast) this.setAndApplyContrast();
     if (prevProps.srcImageBase64 !== this.props.srcImageBase64)
       this.computeResult();
   }
@@ -60,6 +60,11 @@ export default class ImageProcessor extends React.Component<Props> {
   setContrast = () => {
     const { contrast } = this.props;
     this.injectJavaScript(`window.setImageContrast(${contrast});`);
+  };
+
+  setAndApplyContrast = () => {
+    const { contrast } = this.props;
+    this.injectJavaScript(`window.setAndApplyImageContrast(${contrast})`);
   };
 
   requestRawResult = () => {

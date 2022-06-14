@@ -2,12 +2,11 @@ declare global {
   interface Window {
     ReactNativeWebView: any;
     processImage: (imgBase64: string) => void;
-    setImageBrightness: (val: number) => void;
     setImageContrast: (val: number) => void;
+    setAndApplyImageContrast: (val: number) => void;
     requestRawResult: () => void;
   }
 }
-
 
 /* This function is meant to be stringified and its body injected in the webview */
 function codeToInject() {
@@ -26,15 +25,17 @@ function codeToInject() {
 
   /* eslint-enable prettier/prettier */
 
-  /* eslint-disable no-ufezndef */
   /* eslint-disable no-unused-vars */
 
   // simutaneously apply grayscale and contrast to the image
-  function applyFilter(imageData: Uint8ClampedArray, contrastAmount: number): Uint8ClampedArray {
+  function applyFilter(
+    imageData: Uint8ClampedArray,
+    contrastAmount: number,
+  ): Uint8ClampedArray {
     rawResult = "";
 
     const filteredImageData = [];
-  
+
     for (let i = 0; i < imageData.length; i += 4) {
       let gray =
         0.299 * imageData[i] +
@@ -44,22 +45,22 @@ function codeToInject() {
 
       gray = (gray - 128) * contrastAmount + 128;
       // contrast
-  
+
       const gray16levels = Math.floor(gray / 16) * 16;
       // color reduction to 16 levels of gray
-  
+
       rawResult = rawResult.concat((gray16levels / 16).toString(16));
       // adding hexadecimal value of this pixel
-  
+
       filteredImageData.push(gray16levels);
       filteredImageData.push(gray16levels);
       filteredImageData.push(gray16levels);
       // push 3 bytes for color (all the same == gray)
-  
+
       filteredImageData.push(255);
       // push alpha = max = 255
     }
-  
+
     return Uint8ClampedArray.from(filteredImageData);
   }
 
@@ -91,20 +92,20 @@ function codeToInject() {
 
       const context = canvas.getContext("2d");
 
-      if(!context) return;
+      if (!context) return;
 
       context.drawImage(image, 0, 0);
 
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
       const grayData = applyFilter(imageData.data, contrast);
-      
+
       const grayCanvas = document.createElement("canvas");
       grayCanvas.width = image.width;
       grayCanvas.height = image.height;
       const grayContext = grayCanvas.getContext("2d");
 
-      if(!grayContext) return;
+      if (!grayContext) return;
 
       grayContext.putImageData(
         new ImageData(grayData, image.width, image.height),
@@ -118,7 +119,7 @@ function codeToInject() {
         payload: grayScaleBase64,
       });
     } catch (e) {
-      if(e instanceof Error) {
+      if (e instanceof Error) {
         log(e.toString());
         console.error(e);
       }
@@ -142,6 +143,10 @@ function codeToInject() {
 
   window.setImageContrast = val => {
     contrast = val;
+  };
+
+  window.setAndApplyImageContrast = val => {
+    window.setImageContrast(val);
     if (image) computeResult();
   };
 
