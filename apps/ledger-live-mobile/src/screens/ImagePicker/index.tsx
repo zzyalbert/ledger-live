@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Image, ScrollView } from "react-native";
+import { Image, ScrollView, View } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { Button, Flex, Text } from "@ledgerhq/native-ui";
 import styled from "styled-components/native";
@@ -110,6 +110,9 @@ export default function ImagePicker() {
     imageProcessorRef?.current?.requestRawResult();
   }, [imageProcessorRef]);
 
+
+  const [contrast, setContrast] = useState(1);
+
   return (
     <ScrollView>
       <Flex p={5}>
@@ -142,13 +145,18 @@ export default function ImagePicker() {
         {croppedImage?.base64URI && (
           <>
             <Text mt={5} variant="h3">Image processing:</Text>
+            <View style={{ flexDirection: "row"}}>
+              <Button onPress={() => setContrast(1)} type="color">1</Button>
+              <Button onPress={() => setContrast(2)} type="color">2</Button>
+              <Button onPress={() => setContrast(5)} type="color">3</Button>
+              <Button onPress={() => setContrast(8)} type="color">4</Button>
+            </View>
             <ImageProcessor
               ref={imageProcessorRef}
               srcImageBase64={croppedImage?.base64URI}
               onBase64PreviewResult={handleBase64PreviewResult}
               onRawHexResult={handleRawHexResult}
-              contrast={1}
-              brightness={1}
+              contrast={contrast}
             />
           </>
         )}

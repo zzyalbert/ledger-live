@@ -29,6 +29,40 @@ function codeToInject() {
   /* eslint-disable no-ufezndef */
   /* eslint-disable no-unused-vars */
 
+  // simutaneously apply grayscale and contrast to the image
+  function applyFilter(imageData: Uint8ClampedArray, contrastAmount: number): Uint8ClampedArray {
+    rawResult = "";
+
+    const filteredImageData = [];
+  
+    for (let i = 0; i < imageData.length; i += 4) {
+      let gray =
+        0.299 * imageData[i] +
+        0.587 * imageData[i + 1] +
+        0.114 * imageData[i + 2];
+      // grayscale
+
+      gray = (gray - 128) * contrastAmount + 128;
+      // contrast
+  
+      const gray16levels = Math.floor(gray / 16) * 16;
+      // color reduction to 16 levels of gray
+  
+      rawResult = rawResult.concat((gray16levels / 16).toString(16));
+      // adding hexadecimal value of this pixel
+  
+      filteredImageData.push(gray16levels);
+      filteredImageData.push(gray16levels);
+      filteredImageData.push(gray16levels);
+      // push 3 bytes for color (all the same == gray)
+  
+      filteredImageData.push(255);
+      // push alpha = max = 255
+    }
+  
+    return Uint8ClampedArray.from(filteredImageData);
+  }
+
   const postDataToWebView = (data: any) => {
     window.ReactNativeWebView.postMessage(JSON.stringify(data));
   };
@@ -39,11 +73,6 @@ function codeToInject() {
   };
 
   let image: any = null;
-  /**
-   * Image parameters
-   */
-  let brightness = "100%";
-  let contrast = "100%";
 
   /**
    * This is a hexadecimal representation of the final image.
@@ -64,46 +93,15 @@ function codeToInject() {
 
       if(!context) return;
 
-      // TODO: fix this: the values are passed properly but the filter seems to not be applied
-      // this doesn't work on safari that's why it doesn't work on iOS
-      context.filter = `brightness(${brightness}) contrast(${contrast})`;
-      log(context.filter);
       context.drawImage(image, 0, 0);
 
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-      const imageDataGrayScale = [];
-      rawResult = "";
-
-      for (let i = 0; i < imageData.data.length; i += 4) {
-        const gray =
-          0.299 * imageData.data[i] +
-          0.587 * imageData.data[i + 1] +
-          0.114 * imageData.data[i + 2];
-        // grayscale
-
-        const gray16levels = Math.floor(gray / 16) * 16;
-        // color reduction to 16 levels of gray
-
-        rawResult = rawResult.concat((gray16levels / 16).toString(16));
-        // adding hexadecimal value of this pixel 
-
-        imageDataGrayScale.push(gray16levels);
-        imageDataGrayScale.push(gray16levels);
-        imageDataGrayScale.push(gray16levels);
-        // push 3 bytes for color (all the same == gray)
-
-        imageDataGrayScale.push(255);
-        // push alpha = max = 255
-      }
-
+      const grayData = applyFilter(imageData.data, contrast);
+      
       const grayCanvas = document.createElement("canvas");
-
       grayCanvas.width = image.width;
       grayCanvas.height = image.height;
-
-      const grayData = Uint8ClampedArray.from(imageDataGrayScale);
-
       const grayContext = grayCanvas.getContext("2d");
 
       if(!grayContext) return;
@@ -140,15 +138,10 @@ function codeToInject() {
     image.src = imgBase64;
   };
 
-  window.setImageBrightness = val => {
-    const percentVal = `${Math.round(val * 100)}%`;
-    brightness = percentVal;
-    if (image) computeResult();
-  };
+  let contrast = 1;
 
   window.setImageContrast = val => {
-    const percentVal = `${Math.round(val * 100)}%`;
-    contrast = percentVal;
+    contrast = val;
     if (image) computeResult();
   };
 

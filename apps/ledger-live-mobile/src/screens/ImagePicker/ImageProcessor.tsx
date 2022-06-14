@@ -11,13 +11,6 @@ type Props = {
   /**
    * number >= 0
    *  - 0:  full black
-   *  - 1:  original brightness
-   *  - >1: brighter than the original
-   * */
-  brightness: number;
-  /**
-   * number >= 0
-   *  - 0:  full black
    *  - 1:  original contrast
    *  - >1: more contrasted than the original
    * */
@@ -29,16 +22,15 @@ type Props = {
  * the parent using a ref
  *  */
 export default class ImageProcessor extends React.Component<Props> {
-  webViewRef: Ref<WebView> = null;
+  webViewRef: WebView<{}> | null = null;
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.contrast !== this.props.contrast) this.setContrast();
-    if (prevProps.brightness !== this.props.brightness) this.setBrightness();
     if (prevProps.srcImageBase64 !== this.props.srcImageBase64)
       this.computeResult();
   }
 
-  handleMessage = ({ nativeEvent: { data } }) => {
+  handleMessage = ({ nativeEvent: { data } }: any) => {
     const { onBase64PreviewResult, onRawHexResult } = this.props;
     const { type, payload } = JSON.parse(data);
     switch (type) {
@@ -65,11 +57,6 @@ export default class ImageProcessor extends React.Component<Props> {
     this.injectJavaScript(`window.processImage("${srcImageBase64}");`);
   };
 
-  setBrightness = () => {
-    const { brightness } = this.props;
-    this.injectJavaScript(`window.setImageBrightness(${brightness});`);
-  };
-
   setContrast = () => {
     const { contrast } = this.props;
     this.injectJavaScript(`window.setImageContrast(${contrast});`);
@@ -80,7 +67,6 @@ export default class ImageProcessor extends React.Component<Props> {
   };
 
   computeResult = () => {
-    this.setBrightness();
     this.setContrast();
     this.processImage();
   };
