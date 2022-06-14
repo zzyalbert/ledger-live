@@ -224,6 +224,8 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:29.0.3')
 
     implementation 'com.google.firebase:firebase-analytics'
+    
+    implementation 'com.google.android.exoplayer:exoplayer:2.17.1'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
@@ -244,11 +246,11 @@ dependencies {
 
     androidTestImplementation('com.wix:detox:+')
 
-    implementation ('com.google.android.exoplayer:exoplayer:2.13.3')
+    //implementation ('com.google.android.exoplayer:exoplayer:2.13.3')
     compile project(':react-native-video')
-    implementation(project(path: ":storyly-react-native")) {
-        exclude (group: "com.google.android.exoplayer") // this seems like a bad idea, let's see if it breaks at runtime
-    }
+  // implementation(project(path: ":storyly-react-native")) {
+  //      exclude (group: "com.google.android.exoplayer") // this seems like a bad idea, let's see if it breaks at runtime
+   //}
     implementation "androidx.appcompat:appcompat:1.0.0"
 
     // Adjust
