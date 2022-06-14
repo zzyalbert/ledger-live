@@ -22,6 +22,7 @@ import { Currency } from "@ledgerhq/live-common/lib/types";
 import { Storyly } from "storyly-react-native";
 import { useRefreshAccountsOrdering } from "../../actions/general";
 import { accountsSelector } from "../../reducers/accounts";
+import { languageSelector } from "../../reducers/settings";
 import {
   discreetModeSelector,
   counterValueCurrencySelector,
@@ -179,6 +180,11 @@ function PortfolioScreen({ navigation }: Props) {
     [accounts],
   );
 
+  const storylyToken =
+    useSelector(languageSelector) === "fr"
+      ? "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2NfaWQiOjY5NDgsImFwcF9pZCI6MTE0MjIsImluc19pZCI6MTIyMDV9._K95dmyom4OkPKu5ENv62n2nsHo-fM_fvrP9GHc8YJc"
+      : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2NfaWQiOjY5NDgsImFwcF9pZCI6MTE0MjIsImluc19pZCI6MTIxOTh9.XqNitheri5VPDqebtA4JFu1VucVOHYlryki2TqCb1DQ";
+
   const data = useMemo(
     () => [
       !showAssets && (
@@ -307,7 +313,7 @@ function PortfolioScreen({ navigation }: Props) {
           ref={ref => {
             this.storyly = ref;
           }}
-          storylyId="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2NfaWQiOjY5NDgsImFwcF9pZCI6MTE0MjIsImluc19pZCI6MTIxOTh9.XqNitheri5VPDqebtA4JFu1VucVOHYlryki2TqCb1DQ"
+          storylyId={storylyToken}
         />
         <Flex px={6} py={4}>
           <FirmwareUpdateBanner />
