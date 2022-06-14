@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Image, ScrollView, View } from "react-native";
+import { Image, Platform, ScrollView, View } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { Button, Flex, Text } from "@ledgerhq/native-ui";
 import styled from "styled-components/native";
 import ImageProcessor from "./ImageProcessor";
 import GalleryPicker from "./GalleryPicker";
 import ImageCropper from "./ImageCropper";
+import { downloadImageToFile, loadImageSizeAsync } from "./imageUtils";
 
 type RouteParams = {
   imageUrl?: string;
@@ -61,16 +62,16 @@ export default function ImagePicker() {
 
   useEffect(() => {
     if (paramsImageURL) {
-      Image.getSize(
-        paramsImageURL,
-        (width, height) => {
-          setSrcImage({ uri: paramsImageURL, width, height });
-        },
-        error => {
-          console.log("error while Image.getSize of original URL");
-          console.error(error);
-        },
-      );
+      const loadImage = async () => {
+        const [dims, uri] = await Promise.all([
+          loadImageSizeAsync(paramsImageURL),
+          Platform.OS === "android"
+            ? downloadImageToFile(paramsImageURL)
+            : paramsImageURL,
+        ]);
+        setSrcImage({ width: dims.width, height: dims.height, uri });
+      };
+      loadImage();
     }
   }, [paramsImageURL]);
 
