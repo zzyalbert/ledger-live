@@ -44,7 +44,7 @@ export default function ImagePicker() {
   // const [srcImageBase64, setSrcImageBase64] = useState<string | null>(null);
   const [srcImage, setSrcImage] = useState<SrcImage | null>(null);
   const [croppedImage, setCroppedImage] = useState<CroppedImage | null>(null);
-  const [resultImage, setResultImage] = useState<ResultImage | null>(null);
+  // const [resultImage, setResultImage] = useState<ResultImage | null>(null);
 
   const [resultImageBase64, setResultImageBase64] = useState<string | null>(
     null,
@@ -110,7 +110,6 @@ export default function ImagePicker() {
     imageProcessorRef?.current?.requestRawResult();
   }, [imageProcessorRef]);
 
-
   const [contrast, setContrast] = useState(1);
 
   return (
@@ -121,7 +120,9 @@ export default function ImagePicker() {
         )}
         {srcImage?.uri ? (
           <Flex mt={5}>
-            <Text mt={5} variant="h3">Source image:</Text>
+            <Text mt={5} variant="h3">
+              Source image:
+            </Text>
             <PreviewImage
               source={{ uri: srcImage?.uri }}
               style={{
@@ -133,7 +134,9 @@ export default function ImagePicker() {
               }}
             />
             <Flex height={5} />
-            <Text mt={5} variant="h3">Cropping:</Text>
+            <Text mt={5} variant="h3">
+              Cropping:
+            </Text>
             <ImageCropper
               sourceUri={srcImage.uri}
               aspectRatio={{ height: 1920, width: 1080 }}
@@ -144,12 +147,22 @@ export default function ImagePicker() {
         ) : null}
         {croppedImage?.base64URI && (
           <>
-            <Text mt={5} variant="h3">Image processing:</Text>
-            <View style={{ flexDirection: "row"}}>
-              <Button onPress={() => setContrast(1)} type="color">1</Button>
-              <Button onPress={() => setContrast(2)} type="color">2</Button>
-              <Button onPress={() => setContrast(5)} type="color">3</Button>
-              <Button onPress={() => setContrast(8)} type="color">4</Button>
+            <Text mt={5} variant="h3">
+              Image processing:
+            </Text>
+            <View style={{ flexDirection: "row" }}>
+              <Button onPress={() => setContrast(1)} type="color">
+                1
+              </Button>
+              <Button onPress={() => setContrast(2)} type="color">
+                2
+              </Button>
+              <Button onPress={() => setContrast(5)} type="color">
+                3
+              </Button>
+              <Button onPress={() => setContrast(8)} type="color">
+                4
+              </Button>
             </View>
             <ImageProcessor
               ref={imageProcessorRef}
@@ -162,7 +175,9 @@ export default function ImagePicker() {
         )}
         {resultImageBase64 && (
           <Flex>
-            <Text mt={5} variant="h3">result:</Text>
+            <Text mt={5} variant="h3">
+              result:
+            </Text>
             <PreviewImage source={{ uri: resultImageBase64 }} />
             <Button type="main" onPress={requestRawResult}>
               Request & display (shortened) hex data
